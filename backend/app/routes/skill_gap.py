@@ -8,6 +8,15 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["skill-gap"])
 
+# Dependencies
+gap_analyzer = None  # Will be injected from main.py
+
+
+def set_gap_analyzer(analyzer):
+    """Set the gap_analyzer instance"""
+    global gap_analyzer
+    gap_analyzer = analyzer
+
 
 @router.post("/skill-gap", response_model=SkillGapResponse)
 async def analyze_skill_gap(
@@ -20,21 +29,20 @@ async def analyze_skill_gap(
     Args:
         skills: List of user's current skills
         target_role: Target job role
-        gap_analyzer: Service instance
     """
     try:
-        if gap_analyzer is None:
+        analyzer = gap_analyzer
+        if analyzer is None:
             from app.main import gap_analyzer as ga
-
-            gap_analyzer = ga
+            analyzer = ga
 
         target_role = target_role or "Software Engineer"
 
         # Get gap analysis
-        gap_data = gap_analyzer.analyze_gap(skills, [])
+        gap_data = analyzer.analyze_gap(skills, [])
 
         # Get market requirements
-        role_data = gap_analyzer.job_market_engine.get_role_market_fit(target_role)
+        role_data = analyzer.job_market_engine.get_role_market_fit(target_role)
         required_skills_data = role_data.get("required_skills", [])
 
         current_skills = [{"skill": s, "level": 75} for s in gap_data["matching_skills"][:5]]
@@ -43,7 +51,7 @@ async def analyze_skill_gap(
             {"skill": s["skill"], "level": min(int(s["demand"] / 10) * 10, 100)} for s in required_skills_data[:5]
         ]
 
-        priority_skills = gap_analyzer.get_priority_skills(skills, target_role)
+        priority_skills = analyzer.get_priority_skills(skills, target_role)
 
         return SkillGapResponse(
             current_skills=current_skills,

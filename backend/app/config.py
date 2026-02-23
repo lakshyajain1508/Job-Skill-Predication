@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, alias="API_PORT")
 
     # Dataset paths
-    dataset_dir: Path = Field(default=Path(__file__).parent.parent / "dataset", alias="DATASET_DIR")
+    dataset_dir: Path = Field(default=Path(__file__).parent.parent / "Dataset", alias="DATASET_DIR")
 
     # Dataset files
     job_market_csv: str = Field(default="job_market_skills.csv", alias="JOB_MARKET_CSV")
@@ -51,6 +51,32 @@ class Settings(BaseSettings):
             # Fall back to comma-separated parsing
             return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
+
+    @field_validator("dataset_dir", mode="before")
+    @classmethod
+    def resolve_dataset_dir(cls, v):
+        """Resolve dataset directory from absolute/relative/env values."""
+        if not v:
+            return v
+
+        raw_path = Path(v)
+        if raw_path.is_absolute():
+            return raw_path
+
+        backend_root = Path(__file__).parent.parent
+        workspace_root = backend_root.parent
+        candidates = [
+            (backend_root / raw_path),
+            (workspace_root / raw_path),
+            (workspace_root / "Dataset"),
+            (workspace_root / "dataset"),
+        ]
+
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+
+        return backend_root / raw_path
     
     # Logging
     log_level: str = Field(default="info", alias="LOG_LEVEL")

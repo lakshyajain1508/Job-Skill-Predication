@@ -2,6 +2,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Optional
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -20,39 +21,42 @@ class DatasetLoader:
     def load_all_datasets(self) -> bool:
         """Load all CSV files from dataset directory"""
         try:
-            # Load job market skills
-            job_market_path = self.dataset_dir / "job_market_skills.csv"
-            if job_market_path.exists():
-                self.job_market_df = pd.read_csv(job_market_path)
-                logger.info(f"Loaded job_market_skills.csv: {len(self.job_market_df)} rows")
-            else:
-                logger.warning(f"job_market_skills.csv not found at {job_market_path}")
+            csv_files = list(self.dataset_dir.rglob("*.csv"))
+            if not csv_files:
+                logger.warning(f"No CSV files found under dataset directory: {self.dataset_dir}")
+                return False
 
-            # Load data science jobs
-            data_science_path = self.dataset_dir / "data_science_jobs.csv"
-            if data_science_path.exists():
-                self.data_science_df = pd.read_csv(data_science_path)
-                logger.info(f"Loaded data_science_jobs.csv: {len(self.data_science_df)} rows")
-            else:
-                logger.warning(f"data_science_jobs.csv not found at {data_science_path}")
+            loaded_any = False
 
-            # Load resumes
-            resumes_path = self.dataset_dir / "resumes_dataset.csv"
-            if resumes_path.exists():
-                self.resumes_df = pd.read_csv(resumes_path)
-                logger.info(f"Loaded resumes_dataset.csv: {len(self.resumes_df)} rows")
-            else:
-                logger.warning(f"resumes_dataset.csv not found at {resumes_path}")
+            # Prefer explicit files from provided datasets
+            job_skills_path = next((p for p in csv_files if p.name.lower() == "job_skills.csv"), None)
+            future_jobs_path = next((p for p in csv_files if p.name.lower() == "future_jobs_dataset.csv"), None)
+            job_postings_path = next((p for p in csv_files if p.name.lower() == "job_postings.csv"), None)
 
-            # Load skill recommendations
-            skill_rec_path = self.dataset_dir / "skill_career_recommendation.csv"
-            if skill_rec_path.exists():
-                self.skill_recommendation_df = pd.read_csv(skill_rec_path)
-                logger.info(f"Loaded skill_career_recommendation.csv: {len(self.skill_recommendation_df)} rows")
-            else:
-                logger.warning(f"skill_career_recommendation.csv not found at {skill_rec_path}")
+            if job_skills_path and future_jobs_path:
+                df_job_skills = pd.read_csv(job_skills_path)
+                df_future_jobs = pd.read_csv(future_jobs_path)
+                self.job_market_df = pd.concat([df_job_skills, df_future_jobs], ignore_index=True, sort=False)
+                logger.info(
+                    f"Loaded job market datasets: {job_skills_path.name} ({len(df_job_skills)} rows), "
+                    f"{future_jobs_path.name} ({len(df_future_jobs)} rows)"
+                )
+                loaded_any = True
+            elif job_skills_path:
+                self.job_market_df = pd.read_csv(job_skills_path)
+                logger.info(f"Loaded {job_skills_path.name}: {len(self.job_market_df)} rows")
+                loaded_any = True
+            elif future_jobs_path:
+                self.job_market_df = pd.read_csv(future_jobs_path)
+                logger.info(f"Loaded {future_jobs_path.name}: {len(self.job_market_df)} rows")
+                loaded_any = True
 
-            return True
+            if job_postings_path:
+                self.data_science_df = pd.read_csv(job_postings_path)
+                logger.info(f"Loaded {job_postings_path.name}: {len(self.data_science_df)} rows")
+                loaded_any = True
+
+            return loaded_any
 
         except Exception as e:
             logger.error(f"Error loading datasets: {str(e)}")
@@ -86,12 +90,14 @@ class DatasetLoader:
         if self.job_market_df is not None:
             for col in self.job_market_df.columns:
                 if 'skill' in col.lower():
-                    all_skills.extend(self.job_market_df[col].dropna().tolist())
+                    for value in self.job_market_df[col].dropna().tolist():
+                        all_skills.extend(self._split_skills(value))
 
         if self.data_science_df is not None:
             for col in self.data_science_df.columns:
                 if 'skill' in col.lower():
-                    all_skills.extend(self.data_science_df[col].dropna().tolist())
+                    for value in self.data_science_df[col].dropna().tolist():
+                        all_skills.extend(self._split_skills(value))
 
         # Count frequency
         total_jobs = len(all_skills) if all_skills else 1
@@ -107,6 +113,34 @@ class DatasetLoader:
             skill_demand[skill] = round((skill_demand[skill] / total_jobs) * 100, 2)
 
         return skill_demand
+
+    def _split_skills(self, raw_value) -> list:
+        """Split raw skill cells into normalized individual skills."""
+        if raw_value is None:
+            return []
+
+        text = str(raw_value).strip()
+        if not text:
+            return []
+
+        # Remove common list wrappers/quotes
+        cleaned = (
+            text.replace("[", " ")
+            .replace("]", " ")
+            .replace("\"", " ")
+            .replace("'", " ")
+            .replace("\n", ",")
+            .replace("\r", ",")
+        )
+        parts = re.split(r"[,;|/]+", cleaned)
+
+        result = []
+        for part in parts:
+            token = re.sub(r"\s+", " ", part).strip().lower()
+            if token and token not in {"nan", "none", "null"}:
+                result.append(token)
+
+        return result
 
     def get_role_skills(self, role: str) -> dict:
         """Get required skills for a specific role"""

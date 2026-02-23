@@ -8,6 +8,15 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["roadmap"])
 
+# Dependencies
+roadmap_generator = None  # Will be injected from main.py
+
+
+def set_roadmap_generator(generator):
+    """Set the roadmap_generator instance"""
+    global roadmap_generator
+    roadmap_generator = generator
+
 
 @router.post("/generate-roadmap", response_model=RoadmapResponse)
 async def generate_roadmap(
@@ -22,16 +31,15 @@ async def generate_roadmap(
         targetRole: Target career role
         targetSkills: Skills to focus on
         currentExperience: Experience in months
-        roadmap_generator: Service instance
     """
     try:
-        if roadmap_generator is None:
+        generator = roadmap_generator
+        if generator is None:
             from app.main import roadmap_generator as rg
-
-            roadmap_generator = rg
+            generator = rg
 
         # Generate roadmap
-        roadmap_data = roadmap_generator.generate_roadmap(targetRole, targetSkills, currentExperience)
+        roadmap_data = generator.generate_roadmap(targetRole, targetSkills, currentExperience)
 
         # Convert to response format
         weeks = [

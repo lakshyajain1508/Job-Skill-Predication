@@ -1,11 +1,21 @@
 from fastapi import APIRouter
 import logging
+import pandas as pd
 
 from app.models.schemas import DashboardDataResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
+
+# Dependencies
+job_market_engine = None  # Will be injected from main.py
+
+
+def set_job_market_engine(engine):
+    """Set the job_market_engine instance"""
+    global job_market_engine
+    job_market_engine = engine
 
 
 @router.get("/dashboard-data", response_model=DashboardDataResponse)
@@ -17,13 +27,13 @@ async def get_dashboard_data():
         Dashboard statistics and trends
     """
     try:
-        if job_market_engine is None:
+        engine = job_market_engine
+        if engine is None:
             from app.main import job_market_engine as jme
-
-            job_market_engine = jme
+            engine = jme
 
         # Get top skills
-        top_skills = job_market_engine.get_top_skills(5)
+        top_skills = engine.get_top_skills(5)
 
         # Get skill radar data
         skills_radar = [
@@ -34,8 +44,8 @@ async def get_dashboard_data():
             {"skill": "Adaptability", "value": 75},
         ]
 
-        # Market demand
-        market_demand = [{"skill": s["skill"], "demand": s["demand"]} for s in top_skills]
+        # Market demand (dataset-driven)
+        market_demand = [{"skill": s["skill"], "demand": s["demand"]} for s in top_skills if s.get("skill")]
 
         # Score trend
         score_trend = [
@@ -47,12 +57,14 @@ async def get_dashboard_data():
             {"month": "Jun", "score": 72},
         ]
 
-        # AI Insights
-        insights = [
-            "Your technical skills are above average, focus on soft skills",
-            "Machine Learning expertise is highly sought after in your target market",
-            "Consider adding DevOps experience to increase marketability",
-        ]
+        # AI Insights from dataset demand
+        insights = []
+        if top_skills:
+            insights.append(f"Top in-demand skill in current dataset: {top_skills[0]['skill']} ({top_skills[0]['demand']}%)")
+            if len(top_skills) > 1:
+                insights.append(f"Also prioritize {top_skills[1]['skill']} to improve market fit")
+        if not insights:
+            insights = ["No market-demand insights available from dataset yet"]
 
         return DashboardDataResponse(
             employability_score=72.0,
@@ -74,7 +86,7 @@ async def get_dashboard_data():
 
 
 @router.get("/job-trends")
-async def get_job_trends(job_market_engine = None):
+async def get_job_trends():
     """
     Get job market trends and skill demand analysis
 
@@ -82,30 +94,47 @@ async def get_job_trends(job_market_engine = None):
         Market trends and top in-demand skills
     """
     try:
-        if job_market_engine is None:
+        engine = job_market_engine
+        if engine is None:
             from app.main import job_market_engine as jme
+            engine = jme
 
-            job_market_engine = jme
+        trends = engine.get_market_trends()
+        top_skills = engine.get_top_skills(10)
 
-        trends = job_market_engine.get_market_trends()
-        top_skills = job_market_engine.get_top_skills(10)
+        # Build monthly trend data from posting dates when available
+        trend_data = []
+        market_df = getattr(engine.dataset_loader, "job_market_df", None)
+        if market_df is not None and "posting_date" in market_df.columns:
+            try:
+                dates = pd.to_datetime(market_df["posting_date"], errors="coerce")
+                monthly = dates.dropna().dt.to_period("M").value_counts().sort_index()
+                for period, count in monthly.tail(6).items():
+                    trend_data.append({"month": period.strftime("%b"), "demand": int(count)})
+            except Exception:
+                trend_data = []
 
-        # Create trend data
-        trend_data = [
-            {"month": "Jan", "demand": 45, "salary": 95},
-            {"month": "Feb", "demand": 52, "salary": 98},
-            {"month": "Mar", "demand": 48, "salary": 102},
-            {"month": "Apr", "demand": 61, "salary": 105},
-            {"month": "May", "demand": 55, "salary": 108},
-            {"month": "Jun", "demand": 67, "salary": 110},
-        ]
+        # Fallback when posting_date is unavailable
+        if not trend_data:
+            for i, skill in enumerate(top_skills[:6], start=1):
+                trend_data.append({"month": f"M{i}", "demand": float(skill.get("demand", 0))})
 
-        top_roles = [
-            {"role": "Full Stack Developer", "demand": 92},
-            {"role": "DevOps Engineer", "demand": 88},
-            {"role": "Data Engineer", "demand": 85},
-            {"role": "ML Engineer", "demand": 82},
-        ]
+        # Build top roles from job titles in available datasets
+        top_roles = []
+        role_frames = []
+        if market_df is not None and "job_title" in market_df.columns:
+            role_frames.append(market_df["job_title"].dropna().astype(str))
+
+        ds_df = getattr(engine.dataset_loader, "data_science_df", None)
+        if ds_df is not None and "job_title" in ds_df.columns:
+            role_frames.append(ds_df["job_title"].dropna().astype(str))
+
+        if role_frames:
+            combined = pd.concat(role_frames, ignore_index=True)
+            counts = combined.value_counts().head(5)
+            total = int(counts.sum()) if len(counts) > 0 else 1
+            for role, cnt in counts.items():
+                top_roles.append({"role": role, "demand": round((int(cnt) / total) * 100, 2)})
 
         return {
             "trends": trend_data,

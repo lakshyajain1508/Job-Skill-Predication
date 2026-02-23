@@ -15,12 +15,15 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  LineChart,
+  Line,
 } from "recharts";
 
 interface ChartsProps {
   skillsRadar?: Array<{ skill: string; value: number }>;
   marketDemand?: Array<{ skill: string; demand: number }>;
   scoreTrend?: Array<{ month: string; score: number }>;
+  jobTrends?: Array<{ month: string; demand: number }>;
 }
 
 const containerVariants = {
@@ -43,20 +46,9 @@ const itemVariants = {
 };
 
 export default function Charts({
-  skillsRadar = [
-    { skill: "Technical", value: 78 },
-    { skill: "Problem Solving", value: 72 },
-    { skill: "Communication", value: 65 },
-    { skill: "Leadership", value: 60 },
-    { skill: "Adaptability", value: 75 },
-  ],
-  marketDemand = [
-    { skill: "Python", demand: 95 },
-    { skill: "AWS", demand: 92 },
-    { skill: "Docker", demand: 88 },
-    { skill: "React", demand: 85 },
-    { skill: "Kubernetes", demand: 82 },
-  ],
+  skillsRadar = [],
+  marketDemand = [],
+  jobTrends,
 }: ChartsProps) {
   return (
     <motion.div
@@ -119,6 +111,27 @@ export default function Charts({
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
+      {jobTrends && jobTrends.length > 0 && (
+        <motion.div variants={itemVariants} className="glassmorphism rounded-2xl p-6 lg:col-span-2">
+          <h3 className="text-xl font-semibold text-white mb-4">Job Trends</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={jobTrends}>
+              <CartesianGrid stroke="rgba(255, 255, 255, 0.1)" />
+              <XAxis dataKey="month" tick={{ fill: "#d1d5db", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#9ca3af" }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                }}
+                labelStyle={{ color: "#fff" }}
+              />
+              <Line type="monotone" dataKey="demand" stroke="#34d399" strokeWidth={2} dot={{ r: 3 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

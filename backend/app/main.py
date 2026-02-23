@@ -17,7 +17,7 @@ app = FastAPI(title=settings.api_title, version=settings.api_version)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=("*" if settings.debug else settings.cors_origins),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,6 +70,17 @@ app.include_router(analyze_router)
 app.include_router(skill_gap_router)
 app.include_router(roadmap_router)
 app.include_router(dashboard_router)
+
+# Inject services into routers
+from app.routes.analyze import set_gap_analyzer as set_analyze_gap_analyzer
+from app.routes.skill_gap import set_gap_analyzer as set_skill_gap_analyzer
+from app.routes.roadmap import set_roadmap_generator
+from app.routes.dashboard import set_job_market_engine
+
+set_analyze_gap_analyzer(gap_analyzer)
+set_skill_gap_analyzer(gap_analyzer)
+set_roadmap_generator(roadmap_generator)
+set_job_market_engine(job_market_engine)
 
 
 @app.on_event("startup")

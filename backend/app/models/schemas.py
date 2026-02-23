@@ -34,6 +34,9 @@ class ResumeAnalysisResponse(BaseModel):
     key_strengths: List[str]
     missing_skills: List[SkillInfo]
     career_recommendations: List[str]
+    candidate_name: Optional[str] = None
+    candidate_age: Optional[int] = None
+    extracted_skills: List[str] = []
 
 
 class SkillGapResponse(BaseModel):

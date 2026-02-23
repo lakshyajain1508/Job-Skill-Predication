@@ -2,17 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import ScoreGauge from "@/components/ScoreGauge";
 import Charts from "@/components/Charts";
 import { apiService } from "@/services/api";
-import { Lightbulb, TrendingUp } from "lucide-react";
+import { Lightbulb, TrendingUp, Download, Zap, Plus } from "lucide-react";
 
 interface DashboardData {
   employability_score: number;
+  candidate_name?: string;
+  candidate_age?: number;
+  extracted_skills?: string[];
+  key_strengths?: string[];
   skills_radar: Array<{ skill: string; value: number }>;
   market_demand: Array<{ skill: string; demand: number }>;
   insights: string[];
   score_trend?: Array<{ month: string; score: number }>;
+  jobTrends?: Array<{ month: string; demand: number }>;
 }
 
 const containerVariants = {
@@ -36,16 +42,80 @@ const itemVariants = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        // First check for stored analysis result
+        const stored = sessionStorage.getItem("analysisResult");
+        if (stored) {
+          const analysisResult = JSON.parse(stored);
+          console.debug("dashboard: loaded analysisResult from sessionStorage", analysisResult);
+          
+          // Transform analysis result to dashboard data
+          let trendsMarketDemand: Array<{ skill: string; demand: number }> = [];
+          let mappedJobTrends: Array<{ month: string; demand: number }> | undefined;
+
+          // Fetch job trends (non-blocking); attach if available
+          try {
+            const jt = await apiService.getJobTrends();
+            mappedJobTrends = (jt.trends || jt || []).map((t: any) => ({ month: t.month, demand: t.demand || t.jobs || 0 }));
+            trendsMarketDemand = (jt.top_skills || []).slice(0, 5).map((skill: any) => ({
+              skill: skill.skill,
+              demand: skill.demand,
+            }));
+            console.debug("dashboard: jobTrends fetched", mappedJobTrends);
+          } catch (e) {
+            console.warn("Job trends fetch failed:", e);
+          }
+
+          const analysisMarketDemand = (analysisResult.missing_skills || []).slice(0, 5).map((skill: any) => ({
+            skill: skill.skill,
+            demand: skill.demand,
+          }));
+
+          const dashboardData: DashboardData = {
+            employability_score: analysisResult.employability_score || 0,
+            candidate_name: analysisResult.candidate_name || undefined,
+            candidate_age: analysisResult.candidate_age || undefined,
+            extracted_skills: analysisResult.extracted_skills || undefined,
+            key_strengths: analysisResult.key_strengths || undefined,
+            skills_radar: [
+              { skill: "Technical Skills", value: analysisResult.employability_score || 0 },
+              { skill: "Problem Solving", value: Math.max(0, (analysisResult.employability_score || 0) - 5) },
+              { skill: "Communication", value: Math.max(0, (analysisResult.employability_score || 0) - 10) },
+              { skill: "Leadership", value: Math.max(0, (analysisResult.employability_score || 0) - 15) },
+              { skill: "Adaptability", value: Math.max(0, (analysisResult.employability_score || 0) - 5) },
+            ],
+            market_demand: analysisMarketDemand.length > 0 ? analysisMarketDemand : trendsMarketDemand,
+            insights: analysisResult.career_recommendations || [],
+            score_trend: [
+              { month: "Jan", score: Math.max(0, (analysisResult.employability_score || 0) - 14) },
+              { month: "Feb", score: Math.max(0, (analysisResult.employability_score || 0) - 12) },
+              { month: "Mar", score: Math.max(0, (analysisResult.employability_score || 0) - 10) },
+              { month: "Apr", score: Math.max(0, (analysisResult.employability_score || 0) - 8) },
+              { month: "May", score: Math.max(0, (analysisResult.employability_score || 0) - 4) },
+              { month: "Jun", score: analysisResult.employability_score || 0 },
+            ],
+            jobTrends: mappedJobTrends,
+          };
+
+          setData(dashboardData);
+          setLoading(false);
+          return;
+        }
+
+        // Fallback to API
         const result = await apiService.getDashboardData();
         setData(result);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
+        // Show error state
+        setData(null);
       } finally {
         setLoading(false);
       }
@@ -53,6 +123,35 @@ export default function DashboardPage() {
 
     fetchDashboardData();
   }, []);
+
+  const handleDownloadReport = () => {
+    // Generate a simple text report
+    if (!data) return;
+    
+    const report = `
+CAREER ANALYSIS REPORT
+========================
+Generated: ${new Date().toLocaleDateString()}
+
+EMPLOYABILITY SCORE: ${data.employability_score}/100
+
+KEY INSIGHTS:
+${data.insights.map((insight, i) => `${i + 1}. ${insight}`).join('\n')}
+
+IN-DEMAND SKILLS TO DEVELOP:
+${data.market_demand.map((skill, i) => `${i + 1}. ${skill.skill} (Demand: ${skill.demand}%)`).join('\n')}
+
+========================
+`;
+
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(report));
+    element.setAttribute('download', 'career-analysis-report.txt');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
 
   if (loading) {
     return (
@@ -68,7 +167,15 @@ export default function DashboardPage() {
   if (!data) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center">
-        <p className="text-gray-400">No data available</p>
+        <div className="text-center">
+          <p className="text-gray-300 mb-6 text-lg">No analysis data available</p>
+          <button
+            onClick={() => router.push("/analyze")}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+          >
+            Start Analysis
+          </button>
+        </div>
       </div>
     );
   }
@@ -100,6 +207,54 @@ export default function DashboardPage() {
           </p>
         </motion.div>
 
+        {/* Debug Panel - only in non-production */}
+        {process.env.NODE_ENV !== "production" && (
+          <div className="mb-6">
+            <button
+              onClick={() => setShowDebug((s) => !s)}
+              className="px-3 py-1 bg-white/5 border border-white/20 text-white rounded-md text-sm mb-2"
+            >
+              {showDebug ? "Hide Debug" : "Show Debug"}
+            </button>
+
+            {showDebug && (
+              <div className="p-4 bg-black/50 border border-white/10 rounded-lg text-sm text-gray-200">
+                <div className="mb-3">
+                  <strong>Stored analysisResult (sessionStorage):</strong>
+                  <pre className="mt-2 max-h-48 overflow-auto p-2 bg-black/70 rounded">{(() => {
+                    try {
+                      const s = sessionStorage.getItem("analysisResult");
+                      return JSON.stringify(s ? JSON.parse(s) : null, null, 2);
+                    } catch (e) {
+                      return String(e);
+                    }
+                  })()}</pre>
+                </div>
+
+                <div className="mb-3">
+                  <strong>jobTrends (fetched):</strong>
+                  <pre className="mt-2 max-h-48 overflow-auto p-2 bg-black/70 rounded">{data?.jobTrends ? JSON.stringify(data.jobTrends, null, 2) : "(not loaded)"}</pre>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { sessionStorage.removeItem("analysisResult"); location.reload(); }}
+                    className="px-3 py-1 bg-red-600/30 border border-red-600/40 text-red-200 rounded-md text-sm"
+                  >
+                    Clear analysisResult & reload
+                  </button>
+                  <button
+                    onClick={() => location.reload()}
+                    className="px-3 py-1 bg-white/5 border border-white/20 text-white rounded-md text-sm"
+                  >
+                    Reload
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Score Gauge */}
         <motion.div variants={itemVariants} className="mb-12">
           <div className="max-w-md">
@@ -110,11 +265,46 @@ export default function DashboardPage() {
           </div>
         </motion.div>
 
+        {/* Candidate Profile */}
+        <motion.div variants={itemVariants} className="mb-12 glassmorphism rounded-2xl p-6">
+          <h2 className="text-2xl font-bold text-white mb-4">Candidate Profile</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">Name</p>
+              <p className="text-white text-lg font-medium">{data.candidate_name || "Not found in resume"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">Age</p>
+              <p className="text-white text-lg font-medium">{data.candidate_age ?? "Not found in resume"}</p>
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Skills</p>
+            <div className="flex flex-wrap gap-2">
+              {(data.extracted_skills && data.extracted_skills.length > 0
+                ? data.extracted_skills
+                : data.key_strengths || []
+              ).map((skill, index) => (
+                <span
+                  key={`${skill}-${index}`}
+                  className="px-3 py-1 rounded-full text-sm bg-blue-500/15 text-blue-300 border border-blue-400/30"
+                >
+                  {skill}
+                </span>
+              ))}
+              {(!data.extracted_skills || data.extracted_skills.length === 0) && (!data.key_strengths || data.key_strengths.length === 0) && (
+                <span className="text-gray-400 text-sm">No skills extracted</span>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
         {/* Charts Section */}
         <motion.div variants={itemVariants} className="mb-12">
           <Charts
             skillsRadar={data.skills_radar}
             marketDemand={data.market_demand}
+            jobTrends={data.jobTrends}
           />
         </motion.div>
 
@@ -155,13 +345,28 @@ export default function DashboardPage() {
           variants={itemVariants}
           className="mt-12 flex flex-wrap gap-4"
         >
-          <button className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300">
+          <button
+            onClick={handleDownloadReport}
+            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 flex items-center gap-2"
+          >
+            <Download className="w-5 h-5" />
             Download Report
           </button>
-          <button className="px-8 py-3 bg-white/5 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300">
+          <button
+            onClick={() => router.push("/roadmap")}
+            className="px-8 py-3 bg-white/5 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 flex items-center gap-2"
+          >
+            <Zap className="w-5 h-5" />
             Generate Roadmap
           </button>
-          <button className="px-8 py-3 bg-white/5 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300">
+          <button
+            onClick={() => {
+              sessionStorage.removeItem("analysisResult");
+              router.push("/analyze");
+            }}
+            className="px-8 py-3 bg-white/5 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
             New Analysis
           </button>
         </motion.div>
