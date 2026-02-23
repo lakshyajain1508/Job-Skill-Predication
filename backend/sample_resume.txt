@@ -1,3 +1,0 @@
-Name: Alice Example
-Senior Software Engineer
-Skills: Python, AWS, Docker
