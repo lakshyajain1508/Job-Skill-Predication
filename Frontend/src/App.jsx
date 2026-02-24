@@ -4,8 +4,8 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import CursorGlow from './components/CursorGlow'
 import LoadingSkeleton from './components/LoadingSkeleton'
 import Navbar from './components/Navbar'
+import ParticleWaveBackground from './components/ParticleWaveBackground'
 import Sidebar from './components/Sidebar'
-import ThreeBackground from './components/ThreeBackground'
 
 const Home = lazy(() => import('./pages/Home'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -33,8 +33,8 @@ function App() {
   const showSidebar = useMemo(() => location.pathname !== '/', [location.pathname])
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#02030a] text-slate-100">
-      <ThreeBackground />
+    <div className="relative min-h-screen overflow-x-hidden bg-[#05070d] text-slate-100">
+      <ParticleWaveBackground />
       <div className="animated-aurora" />
       <div className="grid-overlay" />
       <CursorGlow />
