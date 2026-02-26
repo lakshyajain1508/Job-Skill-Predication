@@ -3,10 +3,34 @@ import { motion } from 'framer-motion'
 import { HiCheckBadge, HiSparkles } from 'react-icons/hi2'
 import LoadingSkeleton from '../components/LoadingSkeleton'
 
+const defaultPrediction = {
+  match_score: 78,
+  missing_skills: ['MLOps', 'A/B Testing', 'Feature Engineering', 'Stakeholder Storytelling'],
+  career_prediction: 'Data Scientist',
+}
+
 function Results() {
   const [loading, setLoading] = useState(true)
+  const [prediction, setPrediction] = useState(defaultPrediction)
 
   useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('prediction')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setPrediction({
+          match_score: parsed?.match_score ?? defaultPrediction.match_score,
+          missing_skills:
+            Array.isArray(parsed?.missing_skills) && parsed.missing_skills.length
+              ? parsed.missing_skills
+              : defaultPrediction.missing_skills,
+          career_prediction: parsed?.career_prediction || defaultPrediction.career_prediction,
+        })
+      }
+    } catch {
+      setPrediction(defaultPrediction)
+    }
+
     const timer = setTimeout(() => setLoading(false), 1700)
     return () => clearTimeout(timer)
   }, [])
@@ -60,7 +84,7 @@ function Results() {
             >
               <div className="absolute inset-4 rounded-full bg-slate-950/90" />
               <div className="relative text-center">
-                <p className="font-heading text-5xl font-bold text-white">78%</p>
+                <p className="font-heading text-5xl font-bold text-white">{prediction.match_score}%</p>
                 <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Readiness</p>
               </div>
             </div>
@@ -98,7 +122,7 @@ function Results() {
           <div className="glass rounded-2xl border border-slate-700/40 p-5">
             <h3 className="font-heading text-xl text-white">Missing Skills</h3>
             <div className="mt-3 flex flex-wrap gap-2">
-              {['MLOps', 'A/B Testing', 'Feature Engineering', 'Stakeholder Storytelling'].map((item) => (
+              {prediction.missing_skills.map((item) => (
                 <span key={item} className="glow-chip rounded-full bg-fuchsia-500/10 px-3 py-1 text-sm text-fuchsia-100">
                   {item}
                 </span>
@@ -116,7 +140,7 @@ function Results() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-ai text-xs tracking-[0.18em] text-indigo-200">AI RECOMMENDATION</p>
-            <h3 className="mt-2 font-heading text-2xl text-white">Fastest Path: Data Analyst → AI Product Analyst</h3>
+            <h3 className="mt-2 font-heading text-2xl text-white">Fastest Path: {prediction.career_prediction}</h3>
             <p className="mt-2 max-w-3xl text-slate-300">
               Prioritize MLOps foundations, dashboard storytelling, and experimentation design. You can close the current
               gap in approximately 10 weeks with consistent weekly execution.

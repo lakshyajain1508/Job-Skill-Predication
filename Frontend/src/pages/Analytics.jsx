@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Bar,
@@ -15,8 +16,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { fetchAnalytics } from '../api/analyticsService'
 
-const demandData = [
+const defaultDemandData = [
   { month: 'Jan', demand: 42 },
   { month: 'Feb', demand: 48 },
   { month: 'Mar', demand: 55 },
@@ -25,7 +27,7 @@ const demandData = [
   { month: 'Jun', demand: 74 },
 ]
 
-const growthData = [
+const defaultGrowthData = [
   { skill: 'Python', growth: 82 },
   { skill: 'SQL', growth: 67 },
   { skill: 'MLOps', growth: 48 },
@@ -33,7 +35,7 @@ const growthData = [
   { skill: 'Storytelling', growth: 64 },
 ]
 
-const radarData = [
+const defaultRadarData = [
   { subject: 'Tech Depth', A: 78 },
   { subject: 'Analytics', A: 84 },
   { subject: 'Communication', A: 63 },
@@ -42,8 +44,53 @@ const radarData = [
 ]
 
 function Analytics() {
+  const [demandData, setDemandData] = useState(defaultDemandData)
+  const [growthData, setGrowthData] = useState(defaultGrowthData)
+  const [radarData, setRadarData] = useState(defaultRadarData)
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadAnalytics = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetchAnalytics()
+        if (!isMounted) {
+          return
+        }
+
+        setDemandData(
+          Array.isArray(response?.demandTrend) && response.demandTrend.length
+            ? response.demandTrend
+            : defaultDemandData,
+        )
+        setGrowthData(
+          Array.isArray(response?.growthData) && response.growthData.length
+            ? response.growthData
+            : defaultGrowthData,
+        )
+        setRadarData(
+          Array.isArray(response?.radarSkills) && response.radarSkills.length
+            ? response.radarSkills
+            : defaultRadarData,
+        )
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadAnalytics()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   return (
-    <section className="mx-auto max-w-7xl space-y-8 pt-6">
+    <section className="mx-auto max-w-7xl space-y-8 pt-6" data-loading={isLoading}>
       <div>
         <p className="font-ai text-xs tracking-[0.24em] text-cyan-200/80">CHARTS & VISUALIZATION</p>
         <h1 className="mt-3 font-heading text-3xl font-bold text-white">Market Trend & Skill Growth Analytics</h1>

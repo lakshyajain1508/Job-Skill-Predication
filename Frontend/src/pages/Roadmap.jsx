@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { HiChevronDown } from 'react-icons/hi2'
+import { fetchRoadmap } from '../api/roadmapService'
 
-const roadmapSteps = [
+const defaultRoadmapSteps = [
   {
     title: 'Milestone 1 · Foundations',
     duration: 'Week 1-2',
@@ -21,10 +22,39 @@ const roadmapSteps = [
 ]
 
 function Roadmap() {
+  const [roadmapSteps, setRoadmapSteps] = useState(defaultRoadmapSteps)
   const [openIndex, setOpenIndex] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadRoadmap = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetchRoadmap()
+        if (!isMounted) {
+          return
+        }
+
+        const steps = Array.isArray(response?.steps) && response.steps.length ? response.steps : defaultRoadmapSteps
+        setRoadmapSteps(steps)
+        setOpenIndex(0)
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadRoadmap()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
-    <section className="mx-auto max-w-5xl space-y-8 pt-6">
+    <section className="mx-auto max-w-5xl space-y-8 pt-6" data-loading={isLoading}>
       <div>
         <p className="font-ai text-xs tracking-[0.24em] text-cyan-200/80">LEARNING ROADMAP</p>
         <h1 className="mt-3 font-heading text-3xl font-bold text-white">Your Personalized Skill Growth Timeline</h1>

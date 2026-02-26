@@ -7,6 +7,7 @@ import {
   HiOutlineSquaresPlus,
 } from 'react-icons/hi2'
 import AnimatedCard from '../components/AnimatedCard'
+import { fetchDashboard } from '../api/dashboardService'
 
 function CountUp({ end, suffix = '' }) {
   const [value, setValue] = useState(0)
@@ -34,28 +35,63 @@ function CountUp({ end, suffix = '' }) {
 }
 
 function Dashboard() {
+  const [dashboardData, setDashboardData] = useState({
+    skill_match: 83,
+    market_demand: 91,
+    missing_skills_count: 6,
+    career_prediction: 'AI Product Analyst',
+  })
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+    const loadDashboard = async () => {
+      setIsLoading(true)
+      try {
+        const data = await fetchDashboard()
+        if (isMounted && data) {
+          setDashboardData({
+            skill_match: Number(data.skill_match ?? 0),
+            market_demand: Number(data.market_demand ?? 0),
+            missing_skills_count: Number(data.missing_skills_count ?? 0),
+            career_prediction: data.career_prediction || 'Data Scientist',
+          })
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadDashboard()
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const cards = [
     {
       title: 'Skill Match Score',
-      value: <CountUp end={83} suffix="%" />,
+      value: <CountUp end={dashboardData.skill_match} suffix="%" />,
       subtitle: 'Strong match with Data/AI roles',
       icon: HiOutlineSparkles,
     },
     {
       title: 'Market Demand Index',
-      value: <CountUp end={91} suffix="/100" />,
+      value: <CountUp end={dashboardData.market_demand} suffix="/100" />,
       subtitle: 'High opportunity in your target stack',
       icon: HiArrowTrendingUp,
     },
     {
       title: 'Missing Skills',
-      value: <CountUp end={6} />,
+      value: <CountUp end={dashboardData.missing_skills_count} />,
       subtitle: 'Core skills prioritized by demand impact',
       icon: HiOutlineSquaresPlus,
     },
     {
       title: 'Career Prediction',
-      value: 'AI Product Analyst',
+      value: dashboardData.career_prediction,
       subtitle: 'Best-fit role projected over 6 months',
       icon: HiOutlineLightBulb,
     },
@@ -68,7 +104,7 @@ function Dashboard() {
         <h1 className="mt-3 font-heading text-3xl font-bold text-white sm:text-4xl">Live Skill Gap Intelligence</h1>
       </motion.div>
 
-      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4" data-loading={isLoading}>
         {cards.map((card) => (
           <AnimatedCard
             key={card.title}
