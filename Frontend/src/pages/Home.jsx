@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import gsap from 'gsap'
 import { HiArrowLongRight, HiBolt, HiChartBar, HiCpuChip } from 'react-icons/hi2'
 import { useNavigate } from 'react-router-dom'
 import AIOrb from '../components/AIOrb'
@@ -26,22 +25,10 @@ const features = [
 ]
 
 function Home() {
-  const ctaRef = useRef(null)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (!ctaRef.current) {
-      return
-    }
-    const tween = gsap.to(ctaRef.current, {
-      scale: 1.05,
-      repeat: -1,
-      yoyo: true,
-      duration: 1.5,
-      ease: 'sine.inOut',
-    })
-    return () => tween.kill()
-  }, [])
+  const featureItems = useMemo(() => features, [])
+  const goSkills = useCallback(() => navigate('/skills'), [navigate])
+  const goDashboard = useCallback(() => navigate('/dashboard'), [navigate])
 
   return (
     <section className="relative mx-auto max-w-7xl space-y-20 pt-10 sm:pt-16">
@@ -68,16 +55,15 @@ function Home() {
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <button
-              ref={ctaRef}
               type="button"
-              onClick={() => navigate('/skills')}
+              onClick={goSkills}
               className="button-ripple rounded-xl bg-linear-to-r from-blue-500 via-indigo-500 to-cyan-400 px-6 py-3 font-semibold text-white shadow-[0_0_35px_rgba(34,211,238,0.45)]"
             >
               Launch Skill Prediction
             </button>
             <button
               type="button"
-              onClick={() => navigate('/dashboard')}
+              onClick={goDashboard}
               className="rounded-xl border border-cyan-300/30 bg-slate-900/60 px-6 py-3 font-medium text-cyan-100 hover:border-cyan-200/50"
             >
               Explore Demo
@@ -111,7 +97,7 @@ function Home() {
         variants={staggerContainer}
         className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
       >
-        {features.map((item) => (
+        {featureItems.map((item) => (
           <motion.div key={item.title} variants={fadeUp}>
             <AnimatedCard title={item.title} subtitle={item.desc} icon={item.icon} className="h-full" />
           </motion.div>
@@ -163,7 +149,7 @@ function Home() {
           </div>
           <button
             type="button"
-            onClick={() => navigate('/skills')}
+            onClick={goSkills}
             className="button-ripple inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-500 to-cyan-500 px-5 py-3 font-semibold text-white"
           >
             Begin Now <HiArrowLongRight className="text-lg" />
@@ -174,4 +160,4 @@ function Home() {
   )
 }
 
-export default Home
+export default memo(Home)

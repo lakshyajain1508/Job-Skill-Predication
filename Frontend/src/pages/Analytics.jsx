@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Bar,
@@ -50,6 +50,10 @@ function Analytics() {
   const [radarData, setRadarData] = useState(defaultRadarData)
   const [volatilityData, setVolatilityData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const memoDemandData = useMemo(() => demandData, [demandData])
+  const memoGrowthData = useMemo(() => growthData, [growthData])
+  const memoVolatilityData = useMemo(() => volatilityData, [volatilityData])
+  const memoRadarData = useMemo(() => radarData, [radarData])
 
   useEffect(() => {
     let isMounted = true
@@ -109,41 +113,35 @@ function Analytics() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass neon-border rounded-2xl p-5"
-        >
+        <motion.div transition={{ duration: 0.2 }} className="glass neon-border rounded-2xl p-5">
           <h2 className="font-heading text-lg text-white">Demand Trend Graph</h2>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={demandData}>
+              <LineChart data={memoDemandData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
                 <XAxis dataKey="month" stroke="#cbd5e1" />
                 <YAxis stroke="#cbd5e1" />
                 <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(56,189,248,0.35)' }} />
-                <Line type="monotone" dataKey="demand" stroke="#22d3ee" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="demand" stroke="#22d3ee" strokeWidth={3} dot={{ r: 4 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
+          transition={{ duration: 0.2 }}
           className="glass neon-border rounded-2xl p-5"
         >
           <h2 className="font-heading text-lg text-white">Skill Growth Index</h2>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={growthData}>
+              <BarChart data={memoGrowthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
                 <XAxis dataKey="skill" stroke="#cbd5e1" />
                 <YAxis stroke="#cbd5e1" />
                 <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99,102,241,0.35)' }} />
-                <Bar dataKey="growth" radius={[6, 6, 0, 0]} animationDuration={1200}>
-                  {growthData.map((entry) => (
+                <Bar dataKey="growth" radius={[6, 6, 0, 0]} isAnimationActive={false}>
+                  {memoGrowthData.map((entry) => (
                     <Cell key={entry.skill} fill={entry.growth >= 0 ? '#34d399' : '#f87171'} />
                   ))}
                 </Bar>
@@ -159,26 +157,21 @@ function Analytics() {
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.12 }}
-        className="glass neon-border rounded-2xl p-5"
-      >
+      <motion.div transition={{ duration: 0.2 }} className="glass neon-border rounded-2xl p-5">
         <h2 className="font-heading text-lg text-white">Skill Volatility Score</h2>
         <div className="mt-4 h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={volatilityData}>
+            <BarChart data={memoVolatilityData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
               <XAxis dataKey="skill" stroke="#cbd5e1" />
               <YAxis domain={[0, 100]} stroke="#cbd5e1" />
               <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(34,211,238,0.35)' }} />
-              <Bar dataKey="volatility" fill="#22d3ee" radius={[6, 6, 0, 0]} animationDuration={900} />
+              <Bar dataKey="volatility" fill="#22d3ee" radius={[6, 6, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          {volatilityData.slice(0, 6).map((item) => (
+          {memoVolatilityData.slice(0, 6).map((item) => (
             <span
               key={item.skill}
               className="rounded-full border border-cyan-300/25 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-100"
@@ -189,19 +182,14 @@ function Analytics() {
         </div>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.14 }}
-        className="glass neon-border rounded-2xl p-5"
-      >
+      <motion.div transition={{ duration: 0.2 }} className="glass neon-border rounded-2xl p-5">
         <h2 className="font-heading text-lg text-white">Radar Skill Chart</h2>
         <div className="mt-4 h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={radarData}>
+            <RadarChart data={memoRadarData}>
               <PolarGrid stroke="rgba(148,163,184,0.35)" />
               <PolarAngleAxis dataKey="subject" stroke="#cbd5e1" />
-              <Radar name="You" dataKey="A" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.35} />
+              <Radar name="You" dataKey="A" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.35} isAnimationActive={false} />
               <Legend />
               <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(34,211,238,0.35)' }} />
             </RadarChart>

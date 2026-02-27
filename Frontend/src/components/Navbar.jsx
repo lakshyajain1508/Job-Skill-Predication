@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import gsap from 'gsap'
 import { HiBars3BottomRight, HiXMark } from 'react-icons/hi2'
 
 const links = [
@@ -16,9 +15,11 @@ const links = [
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const logoRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
+  const navLinks = useMemo(() => links, [])
+  const goToSkills = useCallback(() => navigate('/skills'), [navigate])
+  const toggleMenu = useCallback(() => setMenuOpen((prev) => !prev), [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -29,20 +30,6 @@ function Navbar() {
   useEffect(() => {
     setMenuOpen(false)
   }, [location.pathname])
-
-  useEffect(() => {
-    if (!logoRef.current) {
-      return
-    }
-    const tween = gsap.to(logoRef.current, {
-      boxShadow: '0 0 20px rgba(34, 211, 238, 0.4), 0 0 60px rgba(79, 70, 229, 0.35)',
-      repeat: -1,
-      yoyo: true,
-      duration: 2.4,
-      ease: 'sine.inOut',
-    })
-    return () => tween.kill()
-  }, [])
 
   return (
     <header
@@ -57,15 +44,12 @@ function Navbar() {
             : 'glass border-cyan-300/15 md:border-transparent md:bg-transparent md:backdrop-blur-0'
         }`}
       >
-        <div
-          ref={logoRef}
-          className="rounded-xl border border-indigo-300/30 bg-indigo-500/20 px-3 py-1.5 font-ai text-sm tracking-[0.18em] text-cyan-100"
-        >
+        <div className="rounded-xl border border-indigo-300/30 bg-indigo-500/20 px-3 py-1.5 font-ai text-sm tracking-[0.18em] text-cyan-100">
           SKILLGAP AI
         </div>
 
         <div className="hidden items-center gap-1 md:flex">
-          {links.map((link) => (
+          {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -82,7 +66,7 @@ function Navbar() {
                     className="absolute bottom-0 left-2 h-0.5 rounded-full bg-linear-to-r from-cyan-400 via-indigo-400 to-violet-400"
                     initial={{ width: 0 }}
                     animate={{ width: isActive ? 'calc(100% - 1rem)' : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }}
                   />
                 </>
               )}
@@ -92,7 +76,7 @@ function Navbar() {
 
         <button
           type="button"
-          onClick={() => navigate('/skills')}
+          onClick={goToSkills}
           className="button-ripple hidden rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20 md:block"
         >
           Start Predicting
@@ -100,7 +84,7 @@ function Navbar() {
 
         <button
           type="button"
-          onClick={() => setMenuOpen((prev) => !prev)}
+          onClick={toggleMenu}
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/30 bg-slate-900/60 text-cyan-100 md:hidden"
           aria-label="Toggle navigation menu"
         >
@@ -118,7 +102,7 @@ function Navbar() {
             className="mx-auto mt-2 max-w-7xl rounded-2xl border border-cyan-300/20 bg-slate-950/85 p-3 backdrop-blur-xl md:hidden"
           >
             <div className="grid gap-1">
-              {links.map((link) => (
+              {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
@@ -135,7 +119,7 @@ function Navbar() {
               ))}
               <button
                 type="button"
-                onClick={() => navigate('/skills')}
+                onClick={goToSkills}
                 className="button-ripple mt-1 rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20"
               >
                 Start Predicting
@@ -148,4 +132,4 @@ function Navbar() {
   )
 }
 
-export default Navbar
+export default memo(Navbar)

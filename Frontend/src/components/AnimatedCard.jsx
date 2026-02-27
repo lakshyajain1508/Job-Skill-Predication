@@ -1,11 +1,12 @@
+import { memo } from 'react'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'
 
 function AnimatedCard({ title, value, subtitle, icon: Icon, className = '', children }) {
   return (
     <motion.div
-      whileHover={{ y: -8, scale: 1.01 }}
-      transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
       className={clsx(
         'glass neon-border rounded-2xl p-5 text-slate-100 shadow-[0_20px_60px_rgba(2,132,199,0.12)]',
         className,
@@ -28,4 +29,4 @@ function AnimatedCard({ title, value, subtitle, icon: Icon, className = '', chil
   )
 }
 
-export default AnimatedCard
+export default memo(AnimatedCard)

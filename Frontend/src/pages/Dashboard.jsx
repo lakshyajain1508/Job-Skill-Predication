@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiArrowTrendingUp,
@@ -96,7 +96,7 @@ function Dashboard() {
     }
   }, [])
 
-  const cards = [
+  const cards = useMemo(() => [
     {
       title: 'Skill Match Score',
       value: <CountUp end={dashboardData.skill_match} suffix="%" />,
@@ -127,11 +127,11 @@ function Dashboard() {
       subtitle: `Growth ${portfolio.growth_potential}/100 • Risk ${portfolio.risk_level}`,
       icon: HiOutlineSparkles,
     },
-  ]
+  ], [dashboardData, portfolio])
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 pt-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div transition={{ duration: 0.2 }}>
         <p className="font-ai text-xs tracking-[0.26em] text-cyan-200/80">AI ANALYTICS DASHBOARD</p>
         <h1 className="mt-3 font-heading text-3xl font-bold text-white sm:text-4xl">Live Skill Gap Intelligence</h1>
       </motion.div>
@@ -168,9 +168,8 @@ function Dashboard() {
                 </div>
                 <div className="h-2 rounded-full bg-slate-800/70">
                   <motion.div
-                    initial={{ width: 0 }}
                     animate={{ width: `${value}%` }}
-                    transition={{ duration: 0.9, ease: 'easeOut' }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
                     className="h-full rounded-full bg-linear-to-r from-cyan-400 via-indigo-500 to-violet-400"
                   />
                 </div>

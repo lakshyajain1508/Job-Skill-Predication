@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { memo, useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   HiHome,
@@ -19,14 +19,15 @@ const links = [
 ]
 
 function Sidebar() {
+  const navLinks = useMemo(() => links, [])
+
   return (
     <aside className="fixed left-0 top-24 z-20 hidden h-[calc(100vh-7rem)] w-20 px-3 md:block">
       <div className="glass neon-border flex h-full flex-col items-center gap-4 rounded-2xl py-4">
-        {links.map(({ to, icon: Icon, label }) => (
+        {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} className="group relative">
             {({ isActive }) => (
-              <motion.div
-                whileHover={{ scale: 1.08, y: -2 }}
+              <div
                 className={`flex h-11 w-11 items-center justify-center rounded-xl border text-lg transition-all ${
                   isActive
                     ? 'border-cyan-300/50 bg-cyan-400/20 text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.4)]'
@@ -35,7 +36,7 @@ function Sidebar() {
                 title={label}
               >
                 <Icon />
-              </motion.div>
+              </div>
             )}
           </NavLink>
         ))}
@@ -44,4 +45,4 @@ function Sidebar() {
   )
 }
 
-export default Sidebar
+export default memo(Sidebar)

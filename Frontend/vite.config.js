@@ -6,13 +6,11 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('three') || id.includes('@react-three')) {
-              return 'three-vendor'
-            }
             if (id.includes('framer-motion') || id.includes('gsap')) {
               return 'motion-vendor'
             }
@@ -21,6 +19,9 @@ export default defineConfig({
             }
             if (id.includes('react-icons')) {
               return 'icons-vendor'
+            }
+            if (id.includes('axios')) {
+              return 'network-vendor'
             }
             return 'vendor'
           }
