@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.services.data_loader import data_loader
+from app.services.market_intelligence import market_intelligence
 
 
 class AnalyticsEngine:
@@ -18,18 +19,17 @@ class AnalyticsEngine:
 
     def get_analytics_payload(self) -> dict[str, Any]:
         cache = data_loader.load_all()
+        intelligence_cache = market_intelligence.prime_cache()
 
         demand_trend = cache.monthly_demand
 
-        top_items = sorted(cache.skill_frequency.items(), key=lambda x: x[1], reverse=True)[:6]
-        max_count = top_items[0][1] if top_items else 1
-
+        growth_items = sorted(intelligence_cache.growth_index.items(), key=lambda x: x[1], reverse=True)[:8]
         growth_data = [
             {
                 "skill": skill.title(),
-                "growth": int(round((count / max_count) * 100)),
+                "growth": int(round(value * 100)),
             }
-            for skill, count in top_items
+            for skill, value in growth_items
         ]
 
         radar_skills = [
@@ -44,6 +44,9 @@ class AnalyticsEngine:
             "demandTrend": demand_trend,
             "growthData": growth_data,
             "radarSkills": radar_skills,
+            "growthIndex": {skill.title(): round(value, 4) for skill, value in intelligence_cache.growth_index.items()},
+            "volatility": {skill.title(): int(value) for skill, value in intelligence_cache.volatility.items()},
+            "saturation": {skill.title(): value for skill, value in intelligence_cache.saturation_label.items()},
         }
 
 

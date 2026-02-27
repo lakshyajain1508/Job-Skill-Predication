@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import { HiArrowLongRight, HiBolt, HiChartBar, HiCpuChip } from 'react-icons/hi2'
+import { useNavigate } from 'react-router-dom'
 import AIOrb from '../components/AIOrb'
 import AnimatedCard from '../components/AnimatedCard'
 import { fadeUp, staggerContainer } from '../animations/variants'
@@ -26,6 +27,7 @@ const features = [
 
 function Home() {
   const ctaRef = useRef(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!ctaRef.current) {
@@ -67,11 +69,17 @@ function Home() {
           <div className="flex flex-wrap items-center gap-4">
             <button
               ref={ctaRef}
-              className="button-ripple rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 px-6 py-3 font-semibold text-white shadow-[0_0_35px_rgba(34,211,238,0.45)]"
+              type="button"
+              onClick={() => navigate('/skills')}
+              className="button-ripple rounded-xl bg-linear-to-r from-blue-500 via-indigo-500 to-cyan-400 px-6 py-3 font-semibold text-white shadow-[0_0_35px_rgba(34,211,238,0.45)]"
             >
               Launch Skill Prediction
             </button>
-            <button className="rounded-xl border border-cyan-300/30 bg-slate-900/60 px-6 py-3 font-medium text-cyan-100 hover:border-cyan-200/50">
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="rounded-xl border border-cyan-300/30 bg-slate-900/60 px-6 py-3 font-medium text-cyan-100 hover:border-cyan-200/50"
+            >
               Explore Demo
             </button>
           </div>
@@ -120,8 +128,8 @@ function Home() {
         <motion.h2 variants={fadeUp} className="font-heading text-3xl font-bold text-white sm:text-4xl">
           How It Works
         </motion.h2>
-        <div className="relative rounded-3xl border border-indigo-300/20 bg-gradient-to-b from-slate-900/60 to-slate-950/70 p-6 sm:p-8">
-          <div className="absolute left-7 top-12 hidden h-[78%] w-[2px] bg-gradient-to-b from-cyan-400/70 to-violet-400/30 sm:block" />
+        <div className="relative rounded-3xl border border-indigo-300/20 bg-linear-to-b from-slate-900/60 to-slate-950/70 p-6 sm:p-8">
+          <div className="absolute left-7 top-12 hidden h-[78%] w-0.5 bg-linear-to-b from-cyan-400/70 to-violet-400/30 sm:block" />
           <div className="space-y-7">
             {[
               ['Upload Profile', 'Add your skills, resume, and target career role.'],
@@ -153,7 +161,11 @@ function Home() {
             <h3 className="font-heading text-2xl text-white">Ready to close your skill gap?</h3>
             <p className="mt-1 text-slate-300">Start your AI-powered journey and align with the future job market.</p>
           </div>
-          <button className="button-ripple inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 px-5 py-3 font-semibold text-white">
+          <button
+            type="button"
+            onClick={() => navigate('/skills')}
+            className="button-ripple inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-500 to-cyan-500 px-5 py-3 font-semibold text-white"
+          >
             Begin Now <HiArrowLongRight className="text-lg" />
           </button>
         </div>

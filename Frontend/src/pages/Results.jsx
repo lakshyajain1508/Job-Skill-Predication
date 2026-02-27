@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { HiCheckBadge, HiSparkles } from 'react-icons/hi2'
 import LoadingSkeleton from '../components/LoadingSkeleton'
+import { fetchCareerRisk, fetchSaturation } from '../api/intelligenceService'
 
 const defaultPrediction = {
   match_score: 78,
@@ -12,27 +13,65 @@ const defaultPrediction = {
 function Results() {
   const [loading, setLoading] = useState(true)
   const [prediction, setPrediction] = useState(defaultPrediction)
+  const [careerRisk, setCareerRisk] = useState(50)
+  const [saturationMap, setSaturationMap] = useState({})
 
   useEffect(() => {
+    let isMounted = true
+    let parsedPrediction = defaultPrediction
+
     try {
       const raw = sessionStorage.getItem('prediction')
       if (raw) {
         const parsed = JSON.parse(raw)
-        setPrediction({
+        parsedPrediction = {
           match_score: parsed?.match_score ?? defaultPrediction.match_score,
           missing_skills:
             Array.isArray(parsed?.missing_skills) && parsed.missing_skills.length
               ? parsed.missing_skills
               : defaultPrediction.missing_skills,
           career_prediction: parsed?.career_prediction || defaultPrediction.career_prediction,
-        })
+        }
+        setPrediction(parsedPrediction)
       }
     } catch {
       setPrediction(defaultPrediction)
     }
 
-    const timer = setTimeout(() => setLoading(false), 1700)
-    return () => clearTimeout(timer)
+    const skillsForIntel = (() => {
+      try {
+        const rawSkills = sessionStorage.getItem('user_skills')
+        const parsedSkills = rawSkills ? JSON.parse(rawSkills) : []
+        if (Array.isArray(parsedSkills) && parsedSkills.length) {
+          return parsedSkills
+        }
+      } catch {
+        return parsedPrediction.missing_skills
+      }
+      return parsedPrediction.missing_skills
+    })()
+
+    Promise.all([fetchSaturation(), fetchCareerRisk(skillsForIntel)])
+      .then(([saturationResponse, riskResponse]) => {
+        if (!isMounted) {
+          return
+        }
+        const normalized = Object.entries(saturationResponse?.saturation || {}).reduce((acc, [key, value]) => {
+          acc[String(key).toLowerCase()] = value
+          return acc
+        }, {})
+        setSaturationMap(normalized)
+        setCareerRisk(Number(riskResponse?.career_risk_score ?? 50))
+      })
+      .finally(() => {
+        if (isMounted) {
+          setTimeout(() => setLoading(false), 1700)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   if (loading) {
@@ -89,6 +128,24 @@ function Results() {
               </div>
             </div>
           </div>
+
+          <div className="mt-6 border-t border-slate-700/40 pt-5">
+            <p className="text-sm text-slate-300">Career Risk Score</p>
+            <div className="mt-3 flex items-center justify-center">
+              <div
+                className="relative flex h-36 w-36 items-center justify-center rounded-full"
+                style={{
+                  background: `conic-gradient(from 120deg, rgba(248,113,113,0.95) 0deg, rgba(217,70,239,0.95) ${Math.round((careerRisk / 100) * 360)}deg, rgba(30,41,59,0.5) ${Math.round((careerRisk / 100) * 360)}deg 360deg)`,
+                }}
+              >
+                <div className="absolute inset-3 rounded-full bg-slate-950/90" />
+                <div className="relative text-center">
+                  <p className="font-heading text-3xl font-bold text-white">{careerRisk}</p>
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-fuchsia-200/80">Risk / 100</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
@@ -111,7 +168,7 @@ function Results() {
                       initial={{ width: 0 }}
                       animate={{ width: `${value}%` }}
                       transition={{ duration: 0.8 }}
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-violet-400"
+                      className="h-full rounded-full bg-linear-to-r from-cyan-400 via-indigo-500 to-violet-400"
                     />
                   </div>
                 </div>
@@ -123,9 +180,20 @@ function Results() {
             <h3 className="font-heading text-xl text-white">Missing Skills</h3>
             <div className="mt-3 flex flex-wrap gap-2">
               {prediction.missing_skills.map((item) => (
-                <span key={item} className="glow-chip rounded-full bg-fuchsia-500/10 px-3 py-1 text-sm text-fuchsia-100">
-                  {item}
-                </span>
+                <div key={item} className="flex items-center gap-2">
+                  <span className="glow-chip rounded-full bg-fuchsia-500/10 px-3 py-1 text-sm text-fuchsia-100">{item}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] ${
+                      (saturationMap?.[String(item).toLowerCase()] || '').includes('High')
+                        ? 'border border-rose-300/30 bg-rose-500/10 text-rose-100'
+                        : (saturationMap?.[String(item).toLowerCase()] || '').includes('Low')
+                          ? 'border border-emerald-300/30 bg-emerald-500/10 text-emerald-100'
+                          : 'border border-amber-300/30 bg-amber-500/10 text-amber-100'
+                    }`}
+                  >
+                    {saturationMap?.[String(item).toLowerCase()] || 'Medium Saturation'}
+                  </span>
+                </div>
               ))}
             </div>
           </div>

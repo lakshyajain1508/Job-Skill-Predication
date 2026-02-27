@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -42,6 +42,9 @@ class AnalyticsResponse(BaseModel):
     demandTrend: List[DemandTrendPoint]
     growthData: List[GrowthPoint]
     radarSkills: List[RadarPoint]
+    growthIndex: Dict[str, float] = Field(default_factory=dict)
+    volatility: Dict[str, int] = Field(default_factory=dict)
+    saturation: Dict[str, str] = Field(default_factory=dict)
 
 
 class RoadmapStep(BaseModel):
@@ -57,3 +60,29 @@ class RoadmapResponse(BaseModel):
 class UploadResponse(BaseModel):
     detected_skills: List[str]
     total_detected: int
+
+
+class PortfolioRequest(BaseModel):
+    skills: List[str] = Field(default_factory=list, description="User skill list for market intelligence")
+
+
+class SkillGrowthIndexResponse(BaseModel):
+    growth: Dict[str, float]
+
+
+class SkillVolatilityResponse(BaseModel):
+    volatility: Dict[str, int]
+
+
+class SaturationResponse(BaseModel):
+    saturation: Dict[str, str]
+
+
+class PortfolioResponse(BaseModel):
+    salary_projection: str
+    growth_potential: int
+    risk_level: str
+
+
+class CareerRiskResponse(BaseModel):
+    career_risk_score: int

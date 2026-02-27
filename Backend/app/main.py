@@ -5,10 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import APP_NAME, APP_VERSION, VALID_DATASET_DIRS
 from app.routes.analytics import router as analytics_router
+from app.routes.intelligence import router as intelligence_router
 from app.routes.predict import router as predict_router
 from app.routes.roadmap import router as roadmap_router
 from app.routes.upload import router as upload_router
 from app.services.data_loader import data_loader
+from app.services.market_intelligence import market_intelligence
 from app.services.prediction_model import prediction_model
 
 
@@ -24,6 +26,7 @@ app.add_middleware(
 
 app.include_router(predict_router)
 app.include_router(analytics_router)
+app.include_router(intelligence_router)
 app.include_router(roadmap_router)
 app.include_router(upload_router)
 
@@ -32,6 +35,7 @@ app.include_router(upload_router)
 def startup_event() -> None:
     data_loader.load_all()
     prediction_model.initialize()
+    market_intelligence.prime_cache()
     app.state.last_prediction = None
 
 

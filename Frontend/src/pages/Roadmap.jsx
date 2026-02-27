@@ -61,7 +61,7 @@ function Roadmap() {
       </div>
 
       <div className="relative space-y-5">
-        <div className="absolute left-5 top-3 h-[94%] w-[2px] bg-gradient-to-b from-cyan-400/80 via-indigo-400/55 to-violet-500/20" />
+        <div className="absolute left-5 top-3 h-[94%] w-0.5 bg-linear-to-b from-cyan-400/80 via-indigo-400/55 to-violet-500/20" />
 
         {roadmapSteps.map((step, index) => {
           const open = openIndex === index

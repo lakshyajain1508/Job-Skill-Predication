@@ -4,6 +4,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
@@ -28,11 +29,11 @@ const defaultDemandData = [
 ]
 
 const defaultGrowthData = [
-  { skill: 'Python', growth: 82 },
-  { skill: 'SQL', growth: 67 },
-  { skill: 'MLOps', growth: 48 },
-  { skill: 'BI Tools', growth: 71 },
-  { skill: 'Storytelling', growth: 64 },
+  { skill: 'Python', growth: 32 },
+  { skill: 'React', growth: 21 },
+  { skill: 'Hadoop', growth: -15 },
+  { skill: 'SQL', growth: 12 },
+  { skill: 'Blockchain', growth: -8 },
 ]
 
 const defaultRadarData = [
@@ -47,6 +48,7 @@ function Analytics() {
   const [demandData, setDemandData] = useState(defaultDemandData)
   const [growthData, setGrowthData] = useState(defaultGrowthData)
   const [radarData, setRadarData] = useState(defaultRadarData)
+  const [volatilityData, setVolatilityData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -65,10 +67,20 @@ function Analytics() {
             ? response.demandTrend
             : defaultDemandData,
         )
-        setGrowthData(
-          Array.isArray(response?.growthData) && response.growthData.length
-            ? response.growthData
-            : defaultGrowthData,
+        const growthEntries = Object.entries(response?.growthIndex || {}).slice(0, 8)
+        setGrowthData(growthEntries.length
+          ? growthEntries.map(([skill, growth]) => ({
+              skill,
+              growth: Number((Number(growth) * 100).toFixed(2)),
+            }))
+          : defaultGrowthData)
+
+        const volatilityEntries = Object.entries(response?.volatility || {}).slice(0, 8)
+        setVolatilityData(
+          volatilityEntries.map(([skill, score]) => ({
+            skill,
+            volatility: Number(score),
+          })),
         )
         setRadarData(
           Array.isArray(response?.radarSkills) && response.radarSkills.length
@@ -122,7 +134,7 @@ function Analytics() {
           transition={{ delay: 0.08 }}
           className="glass neon-border rounded-2xl p-5"
         >
-          <h2 className="font-heading text-lg text-white">Skill Growth Chart</h2>
+          <h2 className="font-heading text-lg text-white">Skill Growth Index</h2>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={growthData}>
@@ -130,7 +142,11 @@ function Analytics() {
                 <XAxis dataKey="skill" stroke="#cbd5e1" />
                 <YAxis stroke="#cbd5e1" />
                 <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99,102,241,0.35)' }} />
-                <Bar dataKey="growth" fill="url(#colorGrowth)" radius={[6, 6, 0, 0]} animationDuration={1200} />
+                <Bar dataKey="growth" radius={[6, 6, 0, 0]} animationDuration={1200}>
+                  {growthData.map((entry) => (
+                    <Cell key={entry.skill} fill={entry.growth >= 0 ? '#34d399' : '#f87171'} />
+                  ))}
+                </Bar>
                 <defs>
                   <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#818cf8" />
@@ -142,6 +158,36 @@ function Analytics() {
           </div>
         </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.12 }}
+        className="glass neon-border rounded-2xl p-5"
+      >
+        <h2 className="font-heading text-lg text-white">Skill Volatility Score</h2>
+        <div className="mt-4 h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={volatilityData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
+              <XAxis dataKey="skill" stroke="#cbd5e1" />
+              <YAxis domain={[0, 100]} stroke="#cbd5e1" />
+              <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(34,211,238,0.35)' }} />
+              <Bar dataKey="volatility" fill="#22d3ee" radius={[6, 6, 0, 0]} animationDuration={900} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {volatilityData.slice(0, 6).map((item) => (
+            <span
+              key={item.skill}
+              className="rounded-full border border-cyan-300/25 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-100"
+            >
+              {item.skill}: {item.volatility}/100
+            </span>
+          ))}
+        </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 18 }}

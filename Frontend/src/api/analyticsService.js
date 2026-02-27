@@ -4,6 +4,9 @@ const fallbackAnalytics = {
   demandTrend: [],
   growthData: [],
   radarSkills: [],
+  growthIndex: {},
+  volatility: {},
+  saturation: {},
 }
 
 export async function fetchAnalytics() {

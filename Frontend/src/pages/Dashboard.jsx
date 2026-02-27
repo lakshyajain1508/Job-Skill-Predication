@@ -8,6 +8,7 @@ import {
 } from 'react-icons/hi2'
 import AnimatedCard from '../components/AnimatedCard'
 import { fetchDashboard } from '../api/dashboardService'
+import { fetchPortfolio } from '../api/intelligenceService'
 
 function CountUp({ end, suffix = '' }) {
   const [value, setValue] = useState(0)
@@ -42,19 +43,44 @@ function Dashboard() {
     career_prediction: 'AI Product Analyst',
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [portfolio, setPortfolio] = useState({
+    salary_projection: '8-12 LPA',
+    growth_potential: 50,
+    risk_level: 'Medium',
+  })
 
   useEffect(() => {
     let isMounted = true
     const loadDashboard = async () => {
       setIsLoading(true)
       try {
-        const data = await fetchDashboard()
+        const [data, portfolioData] = await Promise.all([
+          fetchDashboard(),
+          fetchPortfolio(
+            (() => {
+              try {
+                const raw = sessionStorage.getItem('user_skills')
+                const parsed = raw ? JSON.parse(raw) : []
+                return Array.isArray(parsed) ? parsed : []
+              } catch {
+                return []
+              }
+            })(),
+          ),
+        ])
+
         if (isMounted && data) {
           setDashboardData({
             skill_match: Number(data.skill_match ?? 0),
             market_demand: Number(data.market_demand ?? 0),
             missing_skills_count: Number(data.missing_skills_count ?? 0),
             career_prediction: data.career_prediction || 'Data Scientist',
+          })
+
+          setPortfolio({
+            salary_projection: portfolioData?.salary_projection || '8-12 LPA',
+            growth_potential: Number(portfolioData?.growth_potential ?? 50),
+            risk_level: portfolioData?.risk_level || 'Medium',
           })
         }
       } finally {
@@ -94,6 +120,12 @@ function Dashboard() {
       value: dashboardData.career_prediction,
       subtitle: 'Best-fit role projected over 6 months',
       icon: HiOutlineLightBulb,
+    },
+    {
+      title: 'Skill Portfolio',
+      value: portfolio.salary_projection,
+      subtitle: `Growth ${portfolio.growth_potential}/100 • Risk ${portfolio.risk_level}`,
+      icon: HiOutlineSparkles,
     },
   ]
 
@@ -139,7 +171,7 @@ function Dashboard() {
                     initial={{ width: 0 }}
                     animate={{ width: `${value}%` }}
                     transition={{ duration: 0.9, ease: 'easeOut' }}
-                    className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-violet-400"
+                    className="h-full rounded-full bg-linear-to-r from-cyan-400 via-indigo-500 to-violet-400"
                   />
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { HiOutlineArrowUpTray, HiPlus, HiXMark } from 'react-icons/hi2'
 import { useNavigate } from 'react-router-dom'
 import { runPrediction } from '../api/predictService'
+import { fetchPortfolio } from '../api/intelligenceService'
 import { uploadResume } from '../api/uploadService'
 
 function SkillInput() {
@@ -58,10 +59,17 @@ function SkillInput() {
 
     setIsSubmitting(true)
     try {
-      const response = await runPrediction({
-        skills,
-        target_role: form.targetRole,
-      })
+      const [response, portfolio] = await Promise.all([
+        runPrediction({
+          skills,
+          target_role: form.targetRole,
+        }),
+        fetchPortfolio(skills),
+      ])
+
+      sessionStorage.setItem('user_skills', JSON.stringify(skills))
+      sessionStorage.setItem('portfolio', JSON.stringify(portfolio))
+      sessionStorage.setItem('user_profile', JSON.stringify(form))
       sessionStorage.setItem('prediction', JSON.stringify(response))
       navigate('/results')
     } finally {

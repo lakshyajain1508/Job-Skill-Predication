@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
 import { HiBars3BottomRight, HiXMark } from 'react-icons/hi2'
 
@@ -18,6 +18,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const logoRef = useRef(null)
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -89,7 +90,11 @@ function Navbar() {
           ))}
         </div>
 
-        <button className="button-ripple hidden rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20 md:block">
+        <button
+          type="button"
+          onClick={() => navigate('/skills')}
+          className="button-ripple hidden rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20 md:block"
+        >
           Start Predicting
         </button>
 
@@ -128,7 +133,11 @@ function Navbar() {
                   {link.label}
                 </NavLink>
               ))}
-              <button className="button-ripple mt-1 rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20">
+              <button
+                type="button"
+                onClick={() => navigate('/skills')}
+                className="button-ripple mt-1 rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20"
+              >
                 Start Predicting
               </button>
             </div>
