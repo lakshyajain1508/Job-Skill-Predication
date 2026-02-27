@@ -2,7 +2,6 @@ import { memo, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { HiArrowLongRight, HiBolt, HiChartBar, HiCpuChip } from 'react-icons/hi2'
 import { useNavigate } from 'react-router-dom'
-import AIOrb from '../components/AIOrb'
 import AnimatedCard from '../components/AnimatedCard'
 import { fadeUp, staggerContainer } from '../animations/variants'
 
@@ -32,8 +31,6 @@ function Home() {
 
   return (
     <section className="relative mx-auto max-w-7xl space-y-20 pt-10 sm:pt-16">
-      <AIOrb />
-
       <div className="pointer-events-none absolute -top-14 left-10 h-52 w-52 rounded-full bg-cyan-500/20 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-16 h-56 w-56 rounded-full bg-violet-500/20 blur-3xl" />
       <div className="pointer-events-none absolute bottom-20 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-indigo-500/15 blur-3xl" />
