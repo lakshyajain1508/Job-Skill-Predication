@@ -57,7 +57,7 @@ function Roadmap() {
     <section className="mx-auto max-w-5xl space-y-8 pt-6" data-loading={isLoading}>
       <div>
         <p className="font-ai text-xs tracking-[0.24em] text-cyan-200/80">LEARNING ROADMAP</p>
-        <h1 className="mt-3 font-heading text-3xl font-bold text-white">Your Personalized Skill Growth Timeline</h1>
+        <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-white">Your Personalized Skill Growth Timeline</h1>
       </div>
 
       <div className="relative space-y-5">
@@ -73,19 +73,19 @@ function Roadmap() {
               transition={{ delay: index * 0.08 }}
               className="relative pl-14"
             >
-              <span className="absolute left-0 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/50 bg-cyan-400/15 shadow-[0_0_24px_rgba(34,211,238,0.45)]">
+              <span className="absolute left-0 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-cyan-400/50 bg-cyan-400/15 shadow-[0_0_20px_rgba(34,211,238,0.35)]">
                 <span className="h-3 w-3 rounded-full bg-cyan-300" />
               </span>
 
-              <div className="glass rounded-2xl border border-slate-700/40 p-5">
+              <div className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
                 <button
                   type="button"
                   onClick={() => setOpenIndex(open ? -1 : index)}
                   className="flex w-full items-center justify-between text-left"
                 >
                   <div>
-                    <p className="font-heading text-xl text-white">{step.title}</p>
-                    <p className="text-sm text-cyan-200">{step.duration}</p>
+                    <p className="font-heading text-xl font-semibold tracking-tight text-white">{step.title}</p>
+                    <p className="text-sm font-bold text-cyan-400">{step.duration}</p>
                   </div>
                   <motion.span animate={{ rotate: open ? 180 : 0 }}>
                     <HiChevronDown className="text-xl text-cyan-200" />
@@ -99,7 +99,7 @@ function Roadmap() {
                 >
                   <div className="mt-4 space-y-2">
                     {step.modules.map((module) => (
-                      <div key={module} className="rounded-xl border border-slate-700/40 bg-slate-900/45 px-3 py-2 text-sm text-slate-200">
+                      <div key={module} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-400">
                         {module}
                       </div>
                     ))}

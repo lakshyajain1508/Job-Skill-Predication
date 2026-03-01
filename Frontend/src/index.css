@@ -20,6 +20,11 @@ body,
   min-height: 100%;
 }
 
+#root {
+  position: relative;
+  z-index: 0;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -27,8 +32,16 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: linear-gradient(180deg, #05070d 0%, #0a0f1f 50%, #05070d 100%);
+  background: #05070d;
   overflow-x: hidden;
+}
+
+.global-3d-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 * {
@@ -93,6 +106,30 @@ body {
   box-shadow: inset 0 0 14px rgba(20, 184, 166, 0.12);
 }
 
+.surface-card {
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.surface-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.36);
+}
+
+.surface-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.surface-input:focus {
+  border-color: rgba(34, 211, 238, 0.85);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.75);
+}
+
 @keyframes ripple {
   0% {
     left: 50%;
@@ -126,3 +163,4 @@ body {
     transform: translateX(260%) skewX(-12deg);
   }
 }
+

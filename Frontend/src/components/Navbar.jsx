@@ -38,13 +38,13 @@ function Navbar() {
       }`}
     >
       <nav
-        className={`mx-auto flex max-w-7xl items-center justify-between rounded-2xl border px-4 py-3 transition-all sm:px-6 ${
+        className={`navbar-glow mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-b border-white/10 bg-black/40 px-4 py-3 backdrop-blur-lg transition-all sm:px-6 ${
           scrolled
-            ? 'glass border-cyan-300/20 shadow-[0_12px_40px_rgba(8,145,178,0.12)]'
-            : 'glass border-cyan-300/15 md:border-transparent md:bg-transparent md:backdrop-blur-0'
+            ? 'shadow-lg shadow-black/40'
+            : 'md:border-transparent md:bg-transparent md:backdrop-blur-0'
         }`}
       >
-        <div className="rounded-xl border border-indigo-300/30 bg-indigo-500/20 px-3 py-1.5 font-ai text-sm tracking-[0.18em] text-cyan-100">
+        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 font-ai text-sm tracking-[0.18em] text-white">
           SKILLGAP AI
         </div>
 
@@ -54,8 +54,8 @@ function Navbar() {
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `group relative rounded-lg px-3 py-2 text-sm transition-colors ${
-                  isActive ? 'text-cyan-200' : 'text-slate-300 hover:text-cyan-100'
+                `group relative rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
+                  isActive ? 'text-cyan-300' : 'text-gray-300 hover:text-white'
                 }`
               }
             >
@@ -77,7 +77,7 @@ function Navbar() {
         <button
           type="button"
           onClick={goToSkills}
-          className="button-ripple hidden rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20 md:block"
+          className="button-ripple btn-3d hidden rounded-xl bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-medium text-white transition duration-200 hover:from-cyan-400 hover:to-blue-400 md:block"
         >
           Start Predicting
         </button>
@@ -85,7 +85,7 @@ function Navbar() {
         <button
           type="button"
           onClick={toggleMenu}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/30 bg-slate-900/60 text-cyan-100 md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition duration-200 hover:bg-white/10 md:hidden"
           aria-label="Toggle navigation menu"
         >
           {menuOpen ? <HiXMark className="text-xl" /> : <HiBars3BottomRight className="text-xl" />}
@@ -99,7 +99,7 @@ function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="mx-auto mt-2 max-w-7xl rounded-2xl border border-cyan-300/20 bg-slate-950/85 p-3 backdrop-blur-xl md:hidden"
+            className="mx-auto mt-2 max-w-7xl rounded-2xl border border-white/10 bg-black/50 p-3 backdrop-blur-md md:hidden"
           >
             <div className="grid gap-1">
               {navLinks.map((link) => (
@@ -109,8 +109,8 @@ function Navbar() {
                   className={({ isActive }) =>
                     `rounded-xl px-3 py-2 text-sm ${
                       isActive
-                        ? 'bg-cyan-500/20 text-cyan-100'
-                        : 'text-slate-200 hover:bg-slate-800/70 hover:text-cyan-100'
+                        ? 'bg-white/10 text-cyan-300'
+                        : 'text-gray-200 hover:bg-white/5 hover:text-white'
                     }`
                   }
                 >
@@ -120,7 +120,7 @@ function Navbar() {
               <button
                 type="button"
                 onClick={goToSkills}
-                className="button-ripple mt-1 rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-300/20"
+                className="button-ripple btn-3d mt-1 rounded-xl bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-medium text-white transition duration-200 hover:from-cyan-400 hover:to-blue-400"
               >
                 Start Predicting
               </button>

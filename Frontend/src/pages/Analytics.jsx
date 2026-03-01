@@ -109,20 +109,26 @@ function Analytics() {
     <section className="mx-auto max-w-7xl space-y-8 pt-6" data-loading={isLoading}>
       <div>
         <p className="font-ai text-xs tracking-[0.24em] text-cyan-200/80">CHARTS & VISUALIZATION</p>
-        <h1 className="mt-3 font-heading text-3xl font-bold text-white">Market Trend & Skill Growth Analytics</h1>
+        <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-white">Market Trend & Skill Growth Analytics</h1>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <motion.div transition={{ duration: 0.2 }} className="glass neon-border rounded-2xl p-5">
-          <h2 className="font-heading text-lg text-white">Demand Trend Graph</h2>
+        <motion.div transition={{ duration: 0.2 }} className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
+          <h2 className="font-heading text-lg font-semibold tracking-tight text-white">Demand Trend Graph</h2>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={memoDemandData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
-                <XAxis dataKey="month" stroke="#cbd5e1" />
-                <YAxis stroke="#cbd5e1" />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(56,189,248,0.35)' }} />
-                <Line type="monotone" dataKey="demand" stroke="#22d3ee" strokeWidth={3} dot={{ r: 4 }} isAnimationActive={false} />
+                <defs>
+                  <linearGradient id="lineDemandStroke" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#22d3ee" />
+                    <stop offset="100%" stopColor="#3b82f6" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.12)" />
+                <XAxis dataKey="month" stroke="#94a3b8" />
+                <YAxis stroke="#94a3b8" />
+                <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid rgba(56,189,248,0.3)' }} />
+                <Line type="monotone" dataKey="demand" stroke="url(#lineDemandStroke)" strokeWidth={3} dot={{ r: 4, fill: '#22d3ee' }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -130,43 +136,37 @@ function Analytics() {
 
         <motion.div
           transition={{ duration: 0.2 }}
-          className="glass neon-border rounded-2xl p-5"
+          className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl"
         >
-          <h2 className="font-heading text-lg text-white">Skill Growth Index</h2>
+          <h2 className="font-heading text-lg font-semibold tracking-tight text-white">Skill Growth Index</h2>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={memoGrowthData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
-                <XAxis dataKey="skill" stroke="#cbd5e1" />
-                <YAxis stroke="#cbd5e1" />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99,102,241,0.35)' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.12)" />
+                <XAxis dataKey="skill" stroke="#94a3b8" />
+                <YAxis stroke="#94a3b8" />
+                <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid rgba(99,102,241,0.3)' }} />
                 <Bar dataKey="growth" radius={[6, 6, 0, 0]} isAnimationActive={false}>
                   {memoGrowthData.map((entry) => (
-                    <Cell key={entry.skill} fill={entry.growth >= 0 ? '#34d399' : '#f87171'} />
+                    <Cell key={entry.skill} fill={entry.growth >= 0 ? '#22d3ee' : '#fb7185'} />
                   ))}
                 </Bar>
-                <defs>
-                  <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#818cf8" />
-                    <stop offset="100%" stopColor="#22d3ee" />
-                  </linearGradient>
-                </defs>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
       </div>
 
-      <motion.div transition={{ duration: 0.2 }} className="glass neon-border rounded-2xl p-5">
-        <h2 className="font-heading text-lg text-white">Skill Volatility Score</h2>
+      <motion.div transition={{ duration: 0.2 }} className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
+        <h2 className="font-heading text-lg font-semibold tracking-tight text-white">Skill Volatility Score</h2>
         <div className="mt-4 h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={memoVolatilityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
-              <XAxis dataKey="skill" stroke="#cbd5e1" />
-              <YAxis domain={[0, 100]} stroke="#cbd5e1" />
-              <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(34,211,238,0.35)' }} />
-              <Bar dataKey="volatility" fill="#22d3ee" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.12)" />
+              <XAxis dataKey="skill" stroke="#94a3b8" />
+              <YAxis domain={[0, 100]} stroke="#94a3b8" />
+              <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid rgba(34,211,238,0.3)' }} />
+              <Bar dataKey="volatility" fill="#22d3ee" radius={[8, 8, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -182,16 +182,16 @@ function Analytics() {
         </div>
       </motion.div>
 
-      <motion.div transition={{ duration: 0.2 }} className="glass neon-border rounded-2xl p-5">
-        <h2 className="font-heading text-lg text-white">Radar Skill Chart</h2>
+      <motion.div transition={{ duration: 0.2 }} className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
+        <h2 className="font-heading text-lg font-semibold tracking-tight text-white">Radar Skill Chart</h2>
         <div className="mt-4 h-80">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={memoRadarData}>
-              <PolarGrid stroke="rgba(148,163,184,0.35)" />
-              <PolarAngleAxis dataKey="subject" stroke="#cbd5e1" />
-              <Radar name="You" dataKey="A" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.35} isAnimationActive={false} />
+              <PolarGrid stroke="rgba(148,163,184,0.2)" />
+              <PolarAngleAxis dataKey="subject" stroke="#94a3b8" />
+              <Radar name="You" dataKey="A" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.28} isAnimationActive={false} />
               <Legend />
-              <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(34,211,238,0.35)' }} />
+              <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid rgba(34,211,238,0.3)' }} />
             </RadarChart>
           </ResponsiveContainer>
         </div>

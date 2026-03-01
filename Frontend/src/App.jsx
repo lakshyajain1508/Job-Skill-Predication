@@ -1,5 +1,6 @@
 import { Suspense, lazy, useMemo } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import Global3DBackground from './components/Global3DBackground'
 import LoadingSkeleton from './components/LoadingSkeleton'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
@@ -21,6 +22,7 @@ function App() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden text-slate-100">
+      <Global3DBackground />
       <Navbar />
 
       <div className="relative z-10 flex pt-20">

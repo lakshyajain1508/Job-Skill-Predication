@@ -43,10 +43,10 @@ function Home() {
       >
         <motion.div variants={fadeUp} className="space-y-7">
           <p className="font-ai text-xs tracking-[0.35em] text-cyan-200/80">NEXT-GEN AI EDTECH PLATFORM</p>
-          <h1 className="font-heading text-4xl font-extrabold leading-tight text-white sm:text-6xl">
+          <h1 className="font-heading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">
             Predict Your Future Skills with AI
           </h1>
-          <p className="max-w-xl text-base text-slate-300 sm:text-lg">
+          <p className="max-w-xl text-base text-gray-400 sm:text-lg">
             SkillGap AI analyzes global job dynamics and translates market shifts into a personalized, high-impact
             learning strategy for students and career switchers.
           </p>
@@ -54,21 +54,21 @@ function Home() {
             <button
               type="button"
               onClick={goSkills}
-              className="button-ripple rounded-xl bg-linear-to-r from-blue-500 via-indigo-500 to-cyan-400 px-6 py-3 font-semibold text-white shadow-[0_0_35px_rgba(34,211,238,0.45)]"
+              className="button-ripple btn-3d rounded-xl bg-linear-to-r from-cyan-500 to-blue-500 px-6 py-3 font-semibold text-white transition duration-200 hover:from-cyan-400 hover:to-blue-400"
             >
               Launch Skill Prediction
             </button>
             <button
               type="button"
               onClick={goDashboard}
-              className="rounded-xl border border-cyan-300/30 bg-slate-900/60 px-6 py-3 font-medium text-cyan-100 hover:border-cyan-200/50"
+              className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 font-medium text-gray-200 transition duration-200 hover:bg-white/10 hover:text-white"
             >
               Explore Demo
             </button>
           </div>
         </motion.div>
 
-        <motion.div variants={fadeUp} className="glass neon-border rounded-3xl p-5 sm:p-6">
+        <motion.div variants={fadeUp} className="card-3d glow-soft rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl sm:p-6">
           <p className="font-ai text-xs tracking-[0.2em] text-indigo-200">AI SIGNAL FEED</p>
           <div className="mt-4 space-y-4">
             {[
@@ -76,10 +76,10 @@ function Home() {
               ['Data Storytelling', '+16% role preference'],
               ['MLOps Fundamentals', 'Top skill gap in students'],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-4">
+              <div key={label} className="rounded-xl border border-white/10 bg-white/5 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-300">{label}</p>
-                  <span className="text-sm text-cyan-200">{value}</span>
+                  <p className="text-sm text-gray-400">{label}</p>
+                  <span className="text-sm font-bold text-cyan-400">{value}</span>
                 </div>
               </div>
             ))}
@@ -108,10 +108,10 @@ function Home() {
         variants={staggerContainer}
         className="space-y-8"
       >
-        <motion.h2 variants={fadeUp} className="font-heading text-3xl font-bold text-white sm:text-4xl">
+        <motion.h2 variants={fadeUp} className="font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl">
           How It Works
         </motion.h2>
-        <div className="relative rounded-3xl border border-indigo-300/20 bg-linear-to-b from-slate-900/60 to-slate-950/70 p-6 sm:p-8">
+        <div className="card-3d relative rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl sm:p-8">
           <div className="absolute left-7 top-12 hidden h-[78%] w-0.5 bg-linear-to-b from-cyan-400/70 to-violet-400/30 sm:block" />
           <div className="space-y-7">
             {[
@@ -119,13 +119,13 @@ function Home() {
               ['AI Market Scan', 'Engine maps profile against live demand and trend vectors.'],
               ['Roadmap Output', 'Get prioritized missing skills and learning milestones.'],
             ].map(([title, desc], index) => (
-              <motion.div key={title} variants={fadeUp} className="flex gap-4 rounded-2xl border border-slate-700/30 bg-slate-900/35 p-5">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/20 text-sm font-bold text-cyan-100">
+              <motion.div key={title} variants={fadeUp} className="card-3d flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-sm font-bold text-cyan-400">
                   {index + 1}
                 </div>
                 <div>
-                  <h3 className="font-heading text-xl text-white">{title}</h3>
-                  <p className="mt-1 text-slate-300">{desc}</p>
+                  <h3 className="font-heading text-xl font-semibold tracking-tight text-white">{title}</h3>
+                  <p className="mt-1 text-gray-400">{desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -137,17 +137,17 @@ function Home() {
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="glass neon-border rounded-3xl p-6 sm:p-8"
+        className="card-3d rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl sm:p-8"
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="font-heading text-2xl text-white">Ready to close your skill gap?</h3>
-            <p className="mt-1 text-slate-300">Start your AI-powered journey and align with the future job market.</p>
+            <h3 className="font-heading text-2xl font-semibold tracking-tight text-white">Ready to close your skill gap?</h3>
+            <p className="mt-1 text-gray-400">Start your AI-powered journey and align with the future job market.</p>
           </div>
           <button
             type="button"
             onClick={goSkills}
-            className="button-ripple inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-500 to-cyan-500 px-5 py-3 font-semibold text-white"
+            className="button-ripple btn-3d inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-blue-500 px-5 py-3 font-semibold text-white transition duration-200 hover:from-cyan-400 hover:to-blue-400"
           >
             Begin Now <HiArrowLongRight className="text-lg" />
           </button>

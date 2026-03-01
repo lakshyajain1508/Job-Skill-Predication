@@ -103,16 +103,16 @@ function Results() {
     <section className="mx-auto max-w-6xl space-y-8 pt-6">
       <div>
         <p className="font-ai text-xs tracking-[0.25em] text-cyan-200/80">SKILL GAP RESULT</p>
-        <h1 className="mt-2 font-heading text-3xl font-bold text-white">AI-Powered Career Readiness Output</h1>
+        <h1 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-white">AI-Powered Career Readiness Output</h1>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass neon-border rounded-3xl p-6"
+          className="card-3d rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl"
         >
-          <p className="text-sm text-slate-300">Overall Match</p>
+          <p className="text-sm text-gray-400">Overall Match</p>
           <div className="mt-4 flex items-center justify-center">
             <div
               className="relative flex h-56 w-56 items-center justify-center rounded-full"
@@ -123,14 +123,14 @@ function Results() {
             >
               <div className="absolute inset-4 rounded-full bg-slate-950/90" />
               <div className="relative text-center">
-                <p className="font-heading text-5xl font-bold text-white">{prediction.match_score}%</p>
+                <p className="font-heading text-5xl font-bold text-cyan-400">{prediction.match_score}%</p>
                 <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Readiness</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 border-t border-slate-700/40 pt-5">
-            <p className="text-sm text-slate-300">Career Risk Score</p>
+          <div className="mt-6 border-t border-white/10 pt-5">
+            <p className="text-sm text-gray-400">Career Risk Score</p>
             <div className="mt-3 flex items-center justify-center">
               <div
                 className="relative flex h-36 w-36 items-center justify-center rounded-full"
@@ -140,7 +140,7 @@ function Results() {
               >
                 <div className="absolute inset-3 rounded-full bg-slate-950/90" />
                 <div className="relative text-center">
-                  <p className="font-heading text-3xl font-bold text-white">{careerRisk}</p>
+                  <p className="font-heading text-3xl font-bold text-cyan-400">{careerRisk}</p>
                   <p className="text-[10px] uppercase tracking-[0.16em] text-fuchsia-200/80">Risk / 100</p>
                 </div>
               </div>
@@ -149,8 +149,8 @@ function Results() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-          <div className="glass rounded-2xl border border-slate-700/40 p-5">
-            <h2 className="font-heading text-xl text-white">Skill Comparison</h2>
+          <div className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
+            <h2 className="font-heading text-xl font-semibold tracking-tight text-white">Skill Comparison</h2>
             <div className="mt-4 space-y-3">
               {[
                 ['Python for Data', 88],
@@ -160,10 +160,10 @@ function Results() {
               ].map(([label, value]) => (
                 <div key={label}>
                   <div className="mb-1 flex justify-between text-sm">
-                    <span className="text-slate-300">{label}</span>
-                    <span className="text-cyan-200">{value}%</span>
+                    <span className="text-gray-400">{label}</span>
+                    <span className="font-bold text-cyan-400">{value}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-800">
+                  <div className="h-2 rounded-full bg-white/10">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${value}%` }}
@@ -176,8 +176,8 @@ function Results() {
             </div>
           </div>
 
-          <div className="glass rounded-2xl border border-slate-700/40 p-5">
-            <h3 className="font-heading text-xl text-white">Missing Skills</h3>
+          <div className="card-3d rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
+            <h3 className="font-heading text-xl font-semibold tracking-tight text-white">Missing Skills</h3>
             <div className="mt-3 flex flex-wrap gap-2">
               {prediction.missing_skills.map((item) => (
                 <div key={item} className="flex items-center gap-2">
@@ -203,13 +203,13 @@ function Results() {
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass neon-border rounded-2xl p-6"
+        className="card-3d rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-ai text-xs tracking-[0.18em] text-indigo-200">AI RECOMMENDATION</p>
-            <h3 className="mt-2 font-heading text-2xl text-white">Fastest Path: {prediction.career_prediction}</h3>
-            <p className="mt-2 max-w-3xl text-slate-300">
+            <h3 className="mt-2 font-heading text-2xl font-semibold tracking-tight text-white">Fastest Path: {prediction.career_prediction}</h3>
+            <p className="mt-2 max-w-3xl text-gray-400">
               Prioritize MLOps foundations, dashboard storytelling, and experimentation design. You can close the current
               gap in approximately 10 weeks with consistent weekly execution.
             </p>

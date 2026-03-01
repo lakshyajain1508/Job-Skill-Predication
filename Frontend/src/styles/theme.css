@@ -1,1 +1,48 @@
-/* Reserved for future theme tokens and style extensions. */
+.btn-3d {
+	transform-style: preserve-3d;
+	transition: all 0.25s ease;
+	box-shadow:
+		0 6px 20px rgba(0, 0, 0, 0.4),
+		inset 0 1px rgba(255, 255, 255, 0.1);
+	will-change: transform;
+}
+
+.btn-3d:hover {
+	transform: translateY(-4px) scale(1.02);
+	box-shadow: 0 12px 30px rgba(0, 212, 255, 0.25);
+}
+
+.btn-3d:active {
+	transform: translateY(1px) scale(0.98);
+}
+
+.card-3d {
+	transform-style: preserve-3d;
+	transition: transform 0.25s ease;
+	will-change: transform;
+}
+
+.card-3d:hover {
+	transform: perspective(900px) rotateX(3deg) rotateY(-3deg) translateY(-4px);
+}
+
+.glow-soft {
+	box-shadow: 0 0 40px rgba(0, 212, 255, 0.15);
+}
+
+.navbar-glow {
+	position: relative;
+	overflow: hidden;
+}
+
+.navbar-glow::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	width: 38%;
+	height: 1px;
+	transform: translateX(-50%);
+	background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.8), transparent);
+	box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
+}

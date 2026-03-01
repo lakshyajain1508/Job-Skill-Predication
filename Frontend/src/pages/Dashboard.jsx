@@ -133,7 +133,7 @@ function Dashboard() {
     <section className="mx-auto max-w-7xl space-y-8 pt-6">
       <motion.div transition={{ duration: 0.2 }}>
         <p className="font-ai text-xs tracking-[0.26em] text-cyan-200/80">AI ANALYTICS DASHBOARD</p>
-        <h1 className="mt-3 font-heading text-3xl font-bold text-white sm:text-4xl">Live Skill Gap Intelligence</h1>
+        <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl">Live Skill Gap Intelligence</h1>
       </motion.div>
 
       <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4" data-loading={isLoading}>
@@ -151,9 +151,9 @@ function Dashboard() {
       <div className="grid gap-5 xl:grid-cols-[1.4fr_0.6fr]">
         <motion.div
           whileHover={{ y: -4 }}
-          className="glass neon-border rounded-2xl p-6 shadow-[0_20px_50px_rgba(59,130,246,0.12)]"
+          className="card-3d rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl"
         >
-          <h2 className="font-heading text-xl text-white">Demand Momentum Stream</h2>
+          <h2 className="font-heading text-xl font-semibold tracking-tight text-white">Demand Momentum Stream</h2>
           <div className="mt-5 space-y-4">
             {[
               ['Generative AI', 92],
@@ -163,10 +163,10 @@ function Dashboard() {
             ].map(([label, value]) => (
               <div key={label}>
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-slate-300">{label}</span>
-                  <span className="text-cyan-200">{value}%</span>
+                  <span className="text-gray-400">{label}</span>
+                  <span className="font-bold text-cyan-400">{value}%</span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-800/70">
+                <div className="h-2 rounded-full bg-white/10">
                   <motion.div
                     animate={{ width: `${value}%` }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -178,12 +178,12 @@ function Dashboard() {
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ y: -4 }} className="glass rounded-2xl border border-fuchsia-300/20 p-6">
-          <h3 className="font-heading text-xl text-white">AI Notes</h3>
-          <div className="mt-4 space-y-3 text-sm text-slate-300">
-            <p className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-3">Students with SQL + BI + ML foundations show 2.4x faster interview readiness.</p>
-            <p className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-3">Portfolio projects with business outcomes correlate with higher job conversion.</p>
-            <p className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-3">Focus next 4 weeks on Python data workflows and dashboard communication.</p>
+        <motion.div whileHover={{ y: -4 }} className="card-3d rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl">
+          <h3 className="font-heading text-xl font-semibold tracking-tight text-white">AI Notes</h3>
+          <div className="mt-4 space-y-3 text-sm text-gray-400">
+            <p className="rounded-xl border border-white/10 bg-white/5 p-3">Students with SQL + BI + ML foundations show 2.4x faster interview readiness.</p>
+            <p className="rounded-xl border border-white/10 bg-white/5 p-3">Portfolio projects with business outcomes correlate with higher job conversion.</p>
+            <p className="rounded-xl border border-white/10 bg-white/5 p-3">Focus next 4 weeks on Python data workflows and dashboard communication.</p>
           </div>
         </motion.div>
       </div>

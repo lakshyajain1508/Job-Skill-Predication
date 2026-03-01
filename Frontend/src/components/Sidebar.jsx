@@ -23,15 +23,15 @@ function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-24 z-20 hidden h-[calc(100vh-7rem)] w-20 px-3 md:block">
-      <div className="glass neon-border flex h-full flex-col items-center gap-4 rounded-2xl py-4">
+      <div className="card-3d flex h-full flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/5 py-4 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} className="group relative">
             {({ isActive }) => (
               <div
-                className={`flex h-11 w-11 items-center justify-center rounded-xl border text-lg transition-all ${
+                className={`flex h-11 w-11 items-center justify-center rounded-xl border text-lg transition-all duration-200 ${
                   isActive
-                    ? 'border-cyan-300/50 bg-cyan-400/20 text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.4)]'
-                    : 'border-slate-600/40 bg-slate-800/30 text-slate-300 group-hover:border-cyan-300/40 group-hover:text-cyan-100'
+                    ? 'border-cyan-400/60 bg-cyan-400/15 text-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.35)]'
+                    : 'border-white/10 bg-white/5 text-gray-300 group-hover:border-cyan-400/40 group-hover:bg-white/10 group-hover:text-white'
                 }`}
                 title={label}
               >

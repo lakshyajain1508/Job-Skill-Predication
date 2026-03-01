@@ -103,13 +103,13 @@ function SkillInput() {
     <section className="mx-auto max-w-4xl space-y-6 pt-6">
       <div>
         <p className="font-ai text-xs tracking-[0.25em] text-cyan-200/80">SKILL INPUT ENGINE</p>
-        <h1 className="mt-3 font-heading text-3xl font-bold text-white">Build Your AI Skill Profile</h1>
+        <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-white">Build Your AI Skill Profile</h1>
       </div>
 
       <motion.form
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass neon-border rounded-3xl p-6 sm:p-8"
+        className="card-3d rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-lg shadow-black/30 transition-all duration-200 hover:bg-white/[0.07] hover:shadow-xl sm:p-8"
       >
         <input
           ref={fileInputRef}
@@ -130,7 +130,7 @@ function SkillInput() {
               <input
                 value={form[key]}
                 onChange={(event) => setForm((prev) => ({ ...prev, [key]: event.target.value }))}
-                className="peer w-full rounded-xl border border-slate-600/50 bg-slate-900/50 px-4 pb-3 pt-6 text-slate-100 outline-none transition-all focus:border-cyan-300/70 focus:shadow-[0_0_16px_rgba(34,211,238,0.35)]"
+                className="peer surface-input w-full rounded-xl px-4 pb-3 pt-6 text-white outline-none transition-all focus:ring-1 focus:ring-cyan-400"
                 placeholder=" "
               />
               <span className="pointer-events-none absolute left-4 top-4 text-sm text-slate-400 transition-all peer-focus:top-2 peer-focus:text-xs peer-focus:text-cyan-200 peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs">
@@ -141,8 +141,8 @@ function SkillInput() {
         </div>
 
         <div className="mt-6 space-y-3">
-          <p className="text-sm text-slate-300">Skill Tags</p>
-          <div className="rounded-xl border border-slate-600/50 bg-slate-900/50 p-3">
+          <p className="text-sm text-gray-400">Skill Tags</p>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur-sm">
             <div className="mb-3 flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <span key={skill} className="glow-chip inline-flex items-center gap-1 rounded-full bg-cyan-500/10 px-3 py-1 text-sm text-cyan-100">
@@ -164,12 +164,12 @@ function SkillInput() {
                   }
                 }}
                 placeholder="Type a skill and press Enter"
-                className="w-full rounded-lg border border-slate-700/50 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-300/70"
+                className="surface-input w-full rounded-lg px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-cyan-400"
               />
               <button
                 type="button"
                 onClick={addSkill}
-                className="inline-flex items-center gap-1 rounded-lg border border-cyan-300/40 bg-cyan-500/15 px-3 text-cyan-100"
+                className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 text-gray-200 transition duration-200 hover:bg-white/5 hover:text-white"
               >
                 <HiPlus /> Add
               </button>
@@ -182,7 +182,7 @@ function SkillInput() {
             type="button"
             onClick={handleUploadClick}
             disabled={isUploading}
-            className="inline-flex items-center gap-2 rounded-xl border border-indigo-300/30 bg-indigo-500/15 px-4 py-2 text-indigo-100"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-gray-200 transition duration-200 hover:bg-white/5 hover:text-white"
           >
             <HiOutlineArrowUpTray /> Upload Resume
           </button>
@@ -190,7 +190,7 @@ function SkillInput() {
             type="button"
             onClick={handleRunPrediction}
             disabled={!canSubmit || isSubmitting}
-            className="button-ripple rounded-xl bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 px-6 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="button-ripple btn-3d rounded-xl bg-linear-to-r from-cyan-500 to-blue-500 px-6 py-2.5 font-semibold text-white transition duration-200 hover:from-cyan-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Run AI Skill Analysis
           </button>
