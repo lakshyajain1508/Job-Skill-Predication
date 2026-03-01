@@ -10,6 +10,19 @@ const defaultPrediction = {
   career_prediction: 'Data Scientist',
 }
 
+const normalizeScore = (value, fallback = defaultPrediction.match_score) => {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) {
+    return fallback
+  }
+
+  if (numeric > 0 && numeric <= 1) {
+    return Math.round(numeric * 100)
+  }
+
+  return Math.max(0, Math.min(100, Math.round(numeric)))
+}
+
 function Results() {
   const [loading, setLoading] = useState(true)
   const [prediction, setPrediction] = useState(defaultPrediction)
@@ -25,7 +38,10 @@ function Results() {
       if (raw) {
         const parsed = JSON.parse(raw)
         parsedPrediction = {
-          match_score: parsed?.match_score ?? defaultPrediction.match_score,
+          match_score: normalizeScore(
+            parsed?.match_score ?? parsed?.overall_match ?? parsed?.score ?? parsed?.readiness_score,
+            defaultPrediction.match_score,
+          ),
           missing_skills:
             Array.isArray(parsed?.missing_skills) && parsed.missing_skills.length
               ? parsed.missing_skills
@@ -99,6 +115,9 @@ function Results() {
     )
   }
 
+  const overallMatch = normalizeScore(prediction.match_score, defaultPrediction.match_score)
+  const overallMatchDeg = Math.round((overallMatch / 100) * 360)
+
   return (
     <section className="mx-auto max-w-6xl space-y-8 pt-6">
       <div>
@@ -117,13 +136,12 @@ function Results() {
             <div
               className="relative flex h-56 w-56 items-center justify-center rounded-full"
               style={{
-                background:
-                  'conic-gradient(from 120deg, rgba(34,211,238,1) 0deg, rgba(99,102,241,1) 220deg, rgba(30,41,59,0.5) 220deg 360deg)',
+                background: `conic-gradient(from 120deg, rgba(34,211,238,1) 0deg, rgba(99,102,241,1) ${overallMatchDeg}deg, rgba(30,41,59,0.5) ${overallMatchDeg}deg 360deg)`,
               }}
             >
               <div className="absolute inset-4 rounded-full bg-slate-950/90" />
               <div className="relative text-center">
-                <p className="font-heading text-5xl font-bold text-cyan-400">{prediction.match_score}%</p>
+                <p className="font-heading text-5xl font-bold text-cyan-400">{overallMatch}%</p>
                 <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Readiness</p>
               </div>
             </div>
